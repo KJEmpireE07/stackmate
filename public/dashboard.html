@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StackMate — Dashboard</title>
+  <meta name="description" content="Find and connect with your perfect coding partner."/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    .dashboard-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .dashboard-title { font-size: 1.75rem; font-weight: 800; }
+    .dashboard-subtitle { color: var(--text-secondary); font-size: 0.9375rem; margin-top: 0.25rem; }
+    .filter-bar {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+    }
+    .filter-label { font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .filter-chip {
+      padding: 0.35rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: var(--transition);
+      background: none;
+    }
+    .filter-chip:hover, .filter-chip.active {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: rgba(99,102,241,0.08);
+    }
+    .matches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
+    .match-score-label {
+      font-size: 0.7rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-muted); margin-top: 2px;
+    }
+    .breakdown-tooltip {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      width: 220px;
+      z-index: 50;
+      box-shadow: var(--shadow-md);
+      display: none;
+    }
+    .score-wrap:hover .breakdown-tooltip { display: block; }
+    .score-wrap { position: relative; cursor: pointer; }
+    .notif-badge {
+      position: absolute;
+      top: -4px; right: -4px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--color-danger);
+      font-size: 0.65rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+    }
+    .requests-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .requests-panel-title {
+      font-size: 1rem; font-weight: 700; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .request-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.875rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .request-item:last-child { border-bottom: none; }
+    .request-item-info { flex: 1; }
+    .request-item-name { font-weight: 600; font-size: 0.9375rem; }
+    .request-item-meta { font-size: 0.8125rem; color: var(--text-secondary); }
+    .request-actions { display: flex; gap: 0.5rem; }
+
+    /* Connected partners section */
+    .connections-section {
+      margin-bottom: 2rem;
+    }
+    .connections-section-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .connections-section-title {
+      font-size: 1rem; font-weight: 700;
+    }
+    .connections-count {
+      padding: 0.2rem 0.6rem;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-success);
+    }
+    .connections-grid {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .connection-pill {
+      display: flex; align-items: center; gap: 0.625rem;
+      padding: 0.5rem 1rem 0.5rem 0.5rem;
+      background: rgba(16,185,129,0.06);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 100px;
+      transition: var(--transition);
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+    .connection-pill:hover {
+      background: rgba(16,185,129,0.12);
+      border-color: rgba(16,185,129,0.4);
+      transform: translateY(-1px);
+    }
+    .connection-pill .avatar {
+      width: 32px; height: 32px; font-size: 0.875rem;
+      background: linear-gradient(135deg,#10b981,#06b6d4);
+    }
+    .connection-pill-name { font-size: 0.875rem; font-weight: 600; }
+    .connection-pill-meta { font-size: 0.75rem; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="mesh-bg"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <div class="logo-icon">⚡</div>
+      StackMate
+    </a>
+    <div class="navbar-links">
+      <a href="dashboard.html" class="active">Discover</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div class="navbar-actions">
+      <div style="position:relative;">
+        <button class="btn btn-outline btn-sm" id="notif-btn" onclick="toggleRequests()">
+          🔔 Requests
+        </button>
+        <div class="notif-badge" id="notif-badge" style="display:none;">0</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <div class="container" style="padding-top:2rem;padding-bottom:4rem;">
+
+      <!-- Connection Requests Panel (hidden by default) -->
+      <div class="requests-panel" id="requests-panel" style="display:none;">
+        <div class="requests-panel-title">
+          🔔 Incoming Connection Requests
+          <button class="btn btn-ghost btn-sm" onclick="toggleRequests()" style="margin-left:auto;">Close</button>
+        </div>
+        <div id="requests-list">
+          <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Dashboard Header -->
+      <div class="dashboard-header">
+        <div>
+          <h1 class="dashboard-title">Your Matches 🎯</h1>
+          <p class="dashboard-subtitle">Ranked by how well you complement each other</p>
+        </div>
+        <a href="profile.html" class="btn btn-outline">Edit Profile</a>
+      </div>
+
+      <!-- My Connections (shown only if any exist) -->
+      <div class="connections-section" id="connections-section" style="display:none;">
+        <div class="connections-section-header">
+          <h2 class="connections-section-title">🤝 My Connections</h2>
+          <span class="connections-count" id="connections-count">0</span>
+        </div>
+        <div class="connections-grid" id="connections-grid"></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <span class="filter-label">Goal:</span>
+        <button class="filter-chip active" data-filter="all" onclick="setFilter('all', this)">All</button>
+        <button class="filter-chip" data-filter="hackathon" onclick="setFilter('hackathon', this)">⚡ Hackathon</button>
+        <button class="filter-chip" data-filter="project" onclick="setFilter('project', this)">🛠 Project</button>
+        <button class="filter-chip" data-filter="internship" onclick="setFilter('internship', this)">💼 Internship</button>
+        <button class="filter-chip" data-filter="freelance" onclick="setFilter('freelance', this)">💰 Freelance</button>
+      </div>
+
+      <!-- At-limit banner (hidden by default) -->
+      <div id="limit-banner" style="display:none;align-items:center;gap:0.75rem;padding:1rem 1.25rem;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:var(--radius);margin-bottom:1.5rem;">
+        <span style="font-size:1.25rem;">🔒</span>
+        <div>
+          <div style="font-weight:700;color:#fcd34d;font-size:0.9375rem;">You've reached your connection limit (3/3)</div>
+          <div style="font-size:0.8125rem;color:var(--text-secondary);margin-top:0.125rem;">You can still discover people, but you'll need to remove a connection before adding a new one.</div>
+        </div>
+      </div>
+
+      <!-- Match Cards -->
+      <div id="matches-grid" class="matches-grid">
+        <div class="loading-state" style="grid-column:1/-1;">
+          <div class="spinner"></div>
+          <span>Finding your matches...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

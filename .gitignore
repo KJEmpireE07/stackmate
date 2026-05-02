@@ -1,0 +1,13 @@
+# Dependencies — these are installed via npm install, no need to upload
+node_modules/
+
+# Environment variables — contains secrets like your DB password, NEVER upload this
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

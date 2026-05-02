@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StackMate — Login / Sign Up</title>
+  <meta name="description" content="Sign in or create your StackMate account to start finding your perfect coding partner."/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 460px;
+    }
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .auth-logo a {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 1.375rem; font-weight: 800; color: var(--text-primary);
+    }
+    .auth-logo .logo-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--gradient-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.125rem;
+    }
+    .auth-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      backdrop-filter: blur(20px);
+    }
+    .auth-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      margin-bottom: 2rem;
+    }
+    .auth-tab {
+      flex: 1;
+      padding: 0.625rem;
+      border-radius: 6px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .auth-tab.active {
+      background: var(--gradient-primary);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(99,102,241,0.3);
+    }
+    .auth-form { display: flex; flex-direction: column; gap: 1.125rem; }
+    .auth-form-panel { display: none; }
+    .auth-form-panel.active { display: flex; flex-direction: column; gap: 1.125rem; }
+    .auth-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .auth-subtitle { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+    .password-field { position: relative; }
+    .password-toggle {
+      position: absolute; right: 0.75rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--text-muted); cursor: pointer;
+      font-size: 1.125rem;
+      transition: var(--transition);
+    }
+    .password-toggle:hover { color: var(--text-secondary); }
+    .form-error {
+      padding: 0.75rem 1rem;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: var(--radius-sm);
+      color: #fca5a5;
+      font-size: 0.875rem;
+      display: none;
+    }
+    .form-error.visible { display: block; }
+    .auth-footer { text-align: center; margin-top: 1.25rem; font-size: 0.875rem; color: var(--text-muted); }
+    .auth-footer a { color: var(--color-primary); font-weight: 600; }
+    .auth-footer a:hover { text-decoration: underline; }
+    .password-strength { height: 3px; border-radius: 2px; background: var(--border); margin-top: 0.375rem; overflow: hidden; }
+    .password-strength-bar { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0; }
+  </style>
+</head>
+<body>
+  <div class="mesh-bg"></div>
+
+  <div class="auth-page">
+    <div class="auth-container anim-fade-up">
+      <div class="auth-logo">
+        <a href="index.html">
+          <div class="logo-icon">⚡</div>
+          StackMate
+        </a>
+      </div>
+
+      <div class="auth-card">
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
+          <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Sign Up</button>
+        </div>
+
+        <!-- Error Message -->
+        <div class="form-error" id="auth-error"></div>
+
+        <!-- LOGIN FORM -->
+        <div class="auth-form-panel active" id="panel-login">
+          <div>
+            <h2 class="auth-title">Welcome back 👋</h2>
+            <p class="auth-subtitle">Log in to find your next coding partner.</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email</label>
+            <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="password-field">
+              <input class="form-input" type="password" id="login-password" placeholder="Your password" autocomplete="current-password" style="padding-right:3rem;"/>
+              <button class="password-toggle" onclick="togglePassword('login-password', this)" type="button">👁</button>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" id="login-btn" onclick="handleLogin()" style="width:100%;margin-top:0.5rem;">
+            Log In
+          </button>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <div class="auth-form-panel" id="panel-register">
+          <div>
+            <h2 class="auth-title">Create your account ✨</h2>
+            <p class="auth-subtitle">Join StackMate and find your perfect coding partner.</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Full Name</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="Your full name" autocomplete="name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Password</label>
+            <div class="password-field">
+              <input class="form-input" type="password" id="reg-password" placeholder="Min. 8 characters" autocomplete="new-password" style="padding-right:3rem;" oninput="updateStrength(this.value)"/>
+              <button class="password-toggle" onclick="togglePassword('reg-password', this)" type="button">👁</button>
+            </div>
+            <div class="password-strength">
+              <div class="password-strength-bar" id="strength-bar"></div>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" id="register-btn" onclick="handleRegister()" style="width:100%;margin-top:0.5rem;">
+            Create Account
+          </button>
+          <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;">
+            By signing up you agree to our Terms of Service.
+          </p>
+        </div>
+      </div>
+
+      <p class="auth-footer">
+        <a href="index.html">← Back to Home</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

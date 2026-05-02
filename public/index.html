@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StackMate — Find Your Perfect Coding Partner</title>
+  <meta name="description" content="StackMate connects college students with the perfect coding partner based on skills, goals, and work style. Smart matching for hackathons, projects, and beyond."/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    /* ── Hero ─────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 68px;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 4rem; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.375rem 0.875rem;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 100px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: var(--color-primary); animation: blink 1.5s ease-in-out infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+    .hero-title { font-size: 4rem; font-weight: 900; line-height: 1.05; margin-bottom: 1.25rem; }
+    .hero-subtitle { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 2rem; max-width: 480px; }
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .hero-stats { display: flex; gap: 2rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+    .hero-stat-num { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); }
+    .hero-stat-label { font-size: 0.8125rem; color: var(--text-muted); }
+
+    /* ── Hero Visual ────────────────────────────────── */
+    .hero-visual { position: relative; }
+    .hero-card-stack { position: relative; height: 480px; }
+    .floating-card {
+      position: absolute;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 1.25rem;
+    }
+    .main-match-card {
+      width: 300px; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3;
+    }
+    .card-left { width: 240px; top: 20px; left: -20px; z-index: 2; opacity: 0.65; transform: rotate(-3deg); }
+    .card-right { width: 240px; bottom: 20px; right: -20px; z-index: 2; opacity: 0.65; transform: rotate(3deg); }
+    .match-percent {
+      font-size: 2rem; font-weight: 900;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .fc-name { font-weight: 700; font-size: 0.9375rem; margin-bottom: 0.25rem; }
+    .fc-meta { font-size: 0.75rem; color: var(--text-secondary); }
+    .fc-skills { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.75rem; }
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      pointer-events: none;
+    }
+    .orb1 { width: 300px; height: 300px; background: rgba(99,102,241,0.15); top: 10%; left: 10%; animation: float1 10s ease-in-out infinite; }
+    .orb2 { width: 200px; height: 200px; background: rgba(139,92,246,0.12); bottom: 10%; right: 10%; animation: float2 13s ease-in-out infinite; }
+    .pulse-ring {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 340px; height: 340px;
+      border-radius: 50%;
+      border: 1px solid rgba(99,102,241,0.15);
+      animation: pulse-out 3s ease-out infinite;
+      z-index: 1;
+    }
+    .pulse-ring:nth-child(2) { animation-delay: 1s; }
+    @keyframes pulse-out { 0% { transform: translate(-50%,-50%) scale(0.8); opacity: 0.5; } 100% { transform: translate(-50%,-50%) scale(1.3); opacity: 0; } }
+
+    /* ── Features ───────────────────────────────────── */
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .feature-card {
+      padding: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-4px); box-shadow: var(--shadow-glow); }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: var(--radius-sm);
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .feature-title { font-size: 1.0625rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .feature-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── How it works ───────────────────────────────── */
+    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; position: relative; }
+    .steps-grid::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: calc(12.5% + 20px);
+      right: calc(12.5% + 20px);
+      height: 2px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+      opacity: 0.3;
+    }
+    .step-card { text-align: center; position: relative; }
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--gradient-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.1rem; color: #fff;
+      margin: 0 auto 1.25rem;
+      box-shadow: 0 0 30px rgba(99,102,241,0.3);
+    }
+    .step-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.375rem; }
+    .step-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── CTA Section ────────────────────────────────── */
+    .cta-section {
+      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
+      border: 1px solid rgba(99,102,241,0.15);
+      border-radius: var(--radius-xl);
+      padding: 5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(99,102,241,0.08) 0%, transparent 70%);
+    }
+    .cta-title { font-size: 3rem; font-weight: 900; margin-bottom: 1rem; position: relative; }
+    .cta-subtitle { font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 2rem; position: relative; }
+    .cta-btns { display: flex; gap: 1rem; justify-content: center; position: relative; }
+
+    /* ── Footer ─────────────────────────────────────── */
+    footer {
+      padding: 2.5rem 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      position: relative; z-index: 1;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr; text-align: center; }
+      .hero-visual { display: none; }
+      .hero-subtitle, .hero-cta, .hero-stats { justify-content: center; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid::before { display: none; }
+    }
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2.5rem; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mesh-bg"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <div class="logo-icon">⚡</div>
+      StackMate
+    </a>
+    <div class="navbar-links">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How it works</a>
+    </div>
+    <div class="navbar-actions">
+      <a href="auth.html" class="btn btn-outline" id="nav-login">Log In</a>
+      <a href="auth.html?mode=register" class="btn btn-primary" id="nav-signup">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content anim-fade-up">
+          <div class="hero-eyebrow">
+            <span></span>
+            Built for college students
+          </div>
+          <h1 class="hero-title">
+            Find your perfect<br/>
+            <span class="gradient-text">coding partner</span>
+          </h1>
+          <p class="hero-subtitle">
+            StackMate matches you with the ideal coding partner based on your skills, learning goals, and work style — so you can build something great together.
+          </p>
+          <div class="hero-cta">
+            <a href="auth.html?mode=register" class="btn btn-primary btn-lg" id="hero-cta-signup">
+              🚀 Start Matching Free
+            </a>
+            <a href="#how-it-works" class="btn btn-outline btn-lg">
+              See How It Works
+            </a>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-num gradient-text">5-Factor</div>
+              <div class="hero-stat-label">Match Algorithm</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num gradient-text">100%</div>
+              <div class="hero-stat-label">Student Focused</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num gradient-text">Free</div>
+              <div class="hero-stat-label">Always</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-visual anim-fade-up anim-delay-2">
+          <div class="hero-card-stack">
+            <div class="glow-orb orb1"></div>
+            <div class="glow-orb orb2"></div>
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <!-- Left card -->
+            <div class="floating-card card-left">
+              <div class="fc-name">Arjun Mehta</div>
+              <div class="fc-meta">2nd Year • Computer Science</div>
+              <div class="fc-skills">
+                <span class="skill-tag">React</span>
+                <span class="skill-tag">Node.js</span>
+              </div>
+            </div>
+            <!-- Main card -->
+            <div class="floating-card main-match-card">
+              <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+                <div class="avatar">P</div>
+                <div>
+                  <div class="fc-name">Priya Sharma</div>
+                  <div class="fc-meta">3rd Year • B.Tech CSE • IIT Delhi</div>
+                </div>
+                <div class="match-percent" style="margin-left:auto;">92%</div>
+              </div>
+              <div style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:0.75rem;">
+                🎯 Looking for hackathon partner
+              </div>
+              <div class="fc-skills">
+                <span class="skill-tag">Python</span>
+                <span class="skill-tag">ML</span>
+                <span class="skill-tag">FastAPI</span>
+                <span class="skill-tag">React</span>
+              </div>
+              <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:0.75rem;color:var(--text-muted);">⏱ 10–15 hrs/week</span>
+                <button class="btn btn-primary btn-sm">Connect</button>
+              </div>
+            </div>
+            <!-- Right card -->
+            <div class="floating-card card-right">
+              <div class="fc-name">Sam Verma</div>
+              <div class="fc-meta">3rd Year • Information Technology</div>
+              <div class="fc-skills">
+                <span class="skill-tag">Flutter</span>
+                <span class="skill-tag">Firebase</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:3rem;">
+        <h2 class="section-title">Why <span class="gradient-text">StackMate</span> is different</h2>
+        <p class="section-subtitle" style="margin:0 auto;">Not just another partner finder. We match on what actually matters — skills, goals, and how you work.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card anim-fade-up anim-delay-1">
+          <div class="feature-icon">🎓</div>
+          <h3 class="feature-title">Student-First Structure</h3>
+          <p class="feature-desc">Built specifically for college students. Your year, program, and university are core to how we match you — not an afterthought.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-2">
+          <div class="feature-icon">🧠</div>
+          <h3 class="feature-title">Smart 5-Factor Matching</h3>
+          <p class="feature-desc">We analyze complementary skills, aligned goals, project interests, work style, and year proximity to find your ideal partner.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-3">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Complementary, not identical</h3>
+          <p class="feature-desc">What you're learning should match what they know, and vice versa. Great teams are built on complementary skills, not duplicates.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-1">
+          <div class="feature-icon">🎯</div>
+          <h3 class="feature-title">Goal Alignment</h3>
+          <p class="feature-desc">Both looking for a hackathon team? Or an open source contributor? Goals alignment is the #1 predictor of successful partnerships.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-2">
+          <div class="feature-icon">🕐</div>
+          <h3 class="feature-title">Work Style Match</h3>
+          <p class="feature-desc">Sync or async? 5 hrs/week or 20? We factor in your schedule and collaboration style so expectations are always aligned.</p>
+        </div>
+        <div class="feature-card anim-fade-up anim-delay-3">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Transparent Match Score</h3>
+          <p class="feature-desc">See exactly why you matched. We break down your score by category — so you always know what you're getting into.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section" id="how-it-works" style="background:linear-gradient(180deg, transparent, rgba(99,102,241,0.03) 50%, transparent);">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:3rem;">
+        <h2 class="section-title">How it <span class="gradient-text">works</span></h2>
+        <p class="section-subtitle" style="margin:0 auto;">Four simple steps to find the partner who'll make your project shine.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3 class="step-title">Create Account</h3>
+          <p class="step-desc">Sign up in seconds with your name and email. No social login required.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3 class="step-title">Build Your Profile</h3>
+          <p class="step-desc">Tell us your year, program, skills, what you're learning, and your goals through our guided onboarding.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3 class="step-title">See Your Matches</h3>
+          <p class="step-desc">Get ranked partner suggestions with a match score and breakdown of why you clicked.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <h3 class="step-title">Connect & Build</h3>
+          <p class="step-desc">Send a connection request and start collaborating — on hackathons, projects, research, and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-section">
+        <h2 class="cta-title">Ready to find your <span class="gradient-text">stack partner?</span></h2>
+        <p class="cta-subtitle">Join students who are building together, smarter.</p>
+        <div class="cta-btns">
+          <a href="auth.html?mode=register" class="btn btn-primary btn-lg" id="cta-signup">
+            🚀 Get Started — It's Free
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>⚡ StackMate v2 — Built for builders &nbsp;|&nbsp; Hackathon Edition 2024</p>
+    </div>
+  </footer>
+
+  <script>
+    // Redirect logged-in users to dashboard
+    const token = localStorage.getItem('sm_token');
+    if (token) {
+      document.getElementById('nav-login').href = 'dashboard.html';
+      document.getElementById('nav-login').textContent = 'Dashboard';
+      document.getElementById('nav-signup').style.display = 'none';
+      document.getElementById('hero-cta-signup').href = 'dashboard.html';
+      document.getElementById('hero-cta-signup').textContent = '🚀 Go to Dashboard';
+      if (document.getElementById('cta-signup')) {
+        document.getElementById('cta-signup').href = 'dashboard.html';
+        document.getElementById('cta-signup').textContent = '🚀 Go to Dashboard';
+      }
+    }
+
+    // Animate on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.animationPlayState = 'running';
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.anim-fade-up').forEach(el => {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

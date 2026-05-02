@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StackMate — Complete Your Profile</title>
+  <meta name="description" content="Tell us about yourself so we can find your perfect coding partner."/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    .onboarding-page {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+      position: relative; z-index: 1;
+    }
+    .onboarding-wrap { width: 100%; max-width: 580px; }
+    .onboarding-header { text-align: center; margin-bottom: 2rem; }
+    .onboarding-logo { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.25rem; margin-bottom: 1.5rem; }
+    .onboarding-logo .logo-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; }
+    .onboarding-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2.5rem; backdrop-filter: blur(20px); }
+    .step-panel { display: none; animation: fadeInUp 0.4s ease; }
+    .step-panel.active { display: block; }
+    .step-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.375rem; }
+    .step-subtitle { font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; }
+    .step-form { display: flex; flex-direction: column; gap: 1.125rem; }
+    .step-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; }
+    .goal-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    .goal-option {
+      padding: 1rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      background: var(--bg-card);
+    }
+    .goal-option:hover { border-color: rgba(99,102,241,0.4); background: var(--bg-card-hover); }
+    .goal-option.selected { border-color: var(--color-primary); background: rgba(99,102,241,0.1); }
+    .goal-option-icon { font-size: 1.5rem; margin-bottom: 0.375rem; }
+    .goal-option-label { font-size: 0.875rem; font-weight: 600; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .hours-display { text-align: center; font-size: 1.75rem; font-weight: 800; color: var(--color-primary); margin-bottom: 0.5rem; }
+    .interest-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .interest-chip {
+      padding: 0.4rem 0.875rem;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-secondary);
+    }
+    .interest-chip:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .interest-chip.selected { border-color: var(--color-primary); background: rgba(99,102,241,0.12); color: var(--color-primary); }
+    .style-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="mesh-bg"></div>
+
+  <div class="onboarding-page">
+    <div class="onboarding-wrap anim-fade-up">
+      <div class="onboarding-header">
+        <div class="onboarding-logo">
+          <div class="logo-icon">⚡</div>
+          StackMate
+        </div>
+        <!-- Progress -->
+        <div class="progress-steps" id="progress-steps">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <div class="onboarding-card">
+        <!-- STEP 1: Who are you? -->
+        <div class="step-panel active" id="step-1">
+          <h2 class="step-title">Who are you? 👋</h2>
+          <p class="step-subtitle">Tell us your role so we can tailor your experience.</p>
+          <div class="option-cards" id="role-options">
+            <div class="option-card selected" data-value="student" onclick="selectRole(this)">
+              <div class="option-card-icon">🎓</div>
+              <div class="option-card-title">Student</div>
+              <div class="option-card-desc">Currently enrolled in a college or university</div>
+            </div>
+            <div class="option-card" data-value="professional" onclick="selectRole(this)">
+              <div class="option-card-icon">💼</div>
+              <div class="option-card-title">Professional</div>
+              <div class="option-card-desc">Working in the industry or self-employed</div>
+            </div>
+          </div>
+          <div class="step-nav">
+            <div></div>
+            <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Academic Info -->
+        <div class="step-panel" id="step-2">
+          <h2 class="step-title">Your Academic Info 📚</h2>
+          <p class="step-subtitle">Help others understand where you're coming from.</p>
+          <div class="step-form">
+            <div class="form-group" id="university-group">
+              <label class="form-label" for="university">University / College</label>
+              <input class="form-input" type="text" id="university" placeholder="e.g. IIT Delhi, VIT, BITS Pilani"/>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="program">Program</label>
+                <input class="form-input" type="text" id="program" placeholder="e.g. B.Tech CSE, BCA, MCA"/>
+              </div>
+              <div class="form-group" id="year-group">
+                <label class="form-label" for="year">Current Year</label>
+                <select class="form-select" id="year">
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3" selected>3rd Year</option>
+                  <option value="4">4th Year</option>
+                  <option value="5">5th Year+</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="bio">Short Bio <span style="color:var(--text-muted)">(optional)</span></label>
+              <textarea class="form-input form-textarea" id="bio" placeholder="Tell potential partners a bit about yourself..."></textarea>
+            </div>
+          </div>
+          <div class="step-nav">
+            <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Skills -->
+        <div class="step-panel" id="step-3">
+          <h2 class="step-title">Skills & Learning 💡</h2>
+          <p class="step-subtitle">We match you with partners who know what you're learning — and vice versa.</p>
+          <div class="step-form">
+            <div class="form-group">
+              <label class="form-label">Skills you already have</label>
+              <div class="tags-container" id="skills-container" onclick="document.getElementById('skills-input').focus()">
+                <input class="tag-input" id="skills-input" placeholder="Type a skill and press Enter..." onkeydown="handleTagInput(event, 'skills')"/>
+              </div>
+              <span style="font-size:0.75rem;color:var(--text-muted);">e.g. React, Python, Node.js, SQL</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">What you're currently learning</label>
+              <div class="tags-container" id="learning-container" onclick="document.getElementById('learning-input').focus()">
+                <input class="tag-input" id="learning-input" placeholder="Type a skill and press Enter..." onkeydown="handleTagInput(event, 'learning')"/>
+              </div>
+              <span style="font-size:0.75rem;color:var(--text-muted);">e.g. Machine Learning, Flutter, GraphQL</span>
+            </div>
+          </div>
+          <div class="step-nav">
+            <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: Goals -->
+        <div class="step-panel" id="step-4">
+          <h2 class="step-title">Your Goals 🎯</h2>
+          <p class="step-subtitle">What are you looking to achieve? We'll match you with people who share your ambitions.</p>
+          <div class="step-form">
+            <div class="form-group">
+              <label class="form-label">Short-term Goal</label>
+              <div class="goal-options" id="short-term-options">
+                <div class="goal-option selected" data-value="hackathon" onclick="selectGoal(this, 'short')">
+                  <div class="goal-option-icon">⚡</div>
+                  <div class="goal-option-label">Hackathon</div>
+                </div>
+                <div class="goal-option" data-value="internship" onclick="selectGoal(this, 'short')">
+                  <div class="goal-option-icon">💼</div>
+                  <div class="goal-option-label">Internship Prep</div>
+                </div>
+                <div class="goal-option" data-value="project" onclick="selectGoal(this, 'short')">
+                  <div class="goal-option-icon">🛠️</div>
+                  <div class="goal-option-label">Side Project</div>
+                </div>
+                <div class="goal-option" data-value="freelance" onclick="selectGoal(this, 'short')">
+                  <div class="goal-option-icon">💰</div>
+                  <div class="goal-option-label">Freelancing</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Long-term Goal</label>
+              <div class="goal-options" id="long-term-options">
+                <div class="goal-option selected" data-value="job" onclick="selectGoal(this, 'long')">
+                  <div class="goal-option-icon">🏢</div>
+                  <div class="goal-option-label">Get a Job</div>
+                </div>
+                <div class="goal-option" data-value="startup" onclick="selectGoal(this, 'long')">
+                  <div class="goal-option-icon">🚀</div>
+                  <div class="goal-option-label">Build a Startup</div>
+                </div>
+                <div class="goal-option" data-value="research" onclick="selectGoal(this, 'long')">
+                  <div class="goal-option-icon">🔬</div>
+                  <div class="goal-option-label">Research / PhD</div>
+                </div>
+                <div class="goal-option" data-value="freelance" onclick="selectGoal(this, 'long')">
+                  <div class="goal-option-icon">🌍</div>
+                  <div class="goal-option-label">Full-time Freelance</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-nav">
+            <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+            <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+          </div>
+        </div>
+
+        <!-- STEP 5: Work Style -->
+        <div class="step-panel" id="step-5">
+          <h2 class="step-title">Work Style & Interests 🛠️</h2>
+          <p class="step-subtitle">Help us find someone who vibes with how you work.</p>
+          <div class="step-form">
+            <div class="form-group">
+              <label class="form-label">Hours per week available</label>
+              <div class="hours-display" id="hours-display">5 hrs/week</div>
+              <input type="range" class="range-slider" id="hours-slider" min="1" max="40" value="5" oninput="updateHours(this.value)"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Work Style</label>
+              <div class="style-options">
+                <div class="option-card selected" data-value="sync" onclick="selectWorkStyle(this)">
+                  <div class="option-card-icon">🤝</div>
+                  <div class="option-card-title" style="font-size:0.875rem;">Sync</div>
+                  <div class="option-card-desc" style="font-size:0.7rem;">Live calls, real-time</div>
+                </div>
+                <div class="option-card" data-value="async" onclick="selectWorkStyle(this)">
+                  <div class="option-card-icon">📨</div>
+                  <div class="option-card-title" style="font-size:0.875rem;">Async</div>
+                  <div class="option-card-desc" style="font-size:0.7rem;">Messages, PRs, own pace</div>
+                </div>
+                <div class="option-card" data-value="both" onclick="selectWorkStyle(this)">
+                  <div class="option-card-icon">⚡</div>
+                  <div class="option-card-title" style="font-size:0.875rem;">Both</div>
+                  <div class="option-card-desc" style="font-size:0.7rem;">Flexible, whatever works</div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Project Interests <span style="color:var(--text-muted)">(select all that apply)</span></label>
+              <div class="interest-options" id="interest-options">
+                <div class="interest-chip" data-value="Web Dev" onclick="toggleInterest(this)">🌐 Web Dev</div>
+                <div class="interest-chip" data-value="AI/ML" onclick="toggleInterest(this)">🤖 AI/ML</div>
+                <div class="interest-chip" data-value="Mobile" onclick="toggleInterest(this)">📱 Mobile</div>
+                <div class="interest-chip" data-value="IoT" onclick="toggleInterest(this)">🔌 IoT</div>
+                <div class="interest-chip" data-value="Game Dev" onclick="toggleInterest(this)">🎮 Game Dev</div>
+                <div class="interest-chip" data-value="Cybersecurity" onclick="toggleInterest(this)">🔒 Cybersecurity</div>
+                <div class="interest-chip" data-value="Data Science" onclick="toggleInterest(this)">📊 Data Science</div>
+                <div class="interest-chip" data-value="Open Source" onclick="toggleInterest(this)">🐙 Open Source</div>
+                <div class="interest-chip" data-value="Blockchain" onclick="toggleInterest(this)">⛓️ Blockchain</div>
+                <div class="interest-chip" data-value="Cloud" onclick="toggleInterest(this)">☁️ Cloud</div>
+                <div class="interest-chip" data-value="AR/VR" onclick="toggleInterest(this)">🥽 AR/VR</div>
+                <div class="interest-chip" data-value="DevOps" onclick="toggleInterest(this)">⚙️ DevOps</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="submit-error" style="color:#fca5a5;font-size:0.875rem;margin-top:0.75rem;display:none;"></div>
+
+          <div class="step-nav">
+            <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+            <button class="btn btn-primary btn-lg" id="finish-btn" onclick="submitOnboarding()">
+              🚀 Find My Matches
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/onboarding.js"></script>
+</body>
+</html>
