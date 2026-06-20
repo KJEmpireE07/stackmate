@@ -109,11 +109,11 @@ function renderConnections(connections) {
     const initials = partner.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
     const meta = [partner.program, partner.year ? `Year ${partner.year}` : ''].filter(Boolean).join(' • ');
     return `
-      <a href="partner.html?id=${partner._id}" class="connection-pill">
+      <a href="chat.html?connectionId=${c._id}&partnerId=${partner._id}" class="connection-pill">
         <div class="avatar">${initials}</div>
         <div>
           <div class="connection-pill-name">${partner.name}</div>
-          ${meta ? `<div class="connection-pill-meta">${meta}</div>` : ''}
+          ${meta ? `<div class="connection-pill-meta">${meta} • 💬 Chat</div>` : '<div class="connection-pill-meta">💬 Chat</div>'}
         </div>
       </a>
     `;

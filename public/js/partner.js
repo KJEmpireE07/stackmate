@@ -129,6 +129,23 @@ async function loadPartner() {
         ring.style.transition = 'stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1), stroke 0.5s ease';
       }, 100);
 
+      // Check if already connected — show Chat button instead
+      try {
+        const connections = await apiFetch('/api/connect/all');
+        const existing = connections.find(c => {
+          const fromId = c.from._id || c.from;
+          const toId   = c.to._id   || c.to;
+          return fromId === partnerId || toId === partnerId;
+        });
+        const btn = document.getElementById('connect-btn');
+        if (existing && existing.status === 'accepted') {
+          btn.textContent = '💬 Open Chat';
+          btn.onclick = () => {
+            window.location.href = `chat.html?connectionId=${existing._id}&partnerId=${partnerId}`;
+          };
+        }
+      } catch(e) { /* silent */ }
+
       // Breakdown
       document.getElementById('breakdown-card').style.display = 'block';
       const factors = [

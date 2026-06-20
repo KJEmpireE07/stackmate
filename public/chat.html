@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StackMate — Chat</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    .chat-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 5.5rem 1rem 6rem; /* top clears navbar, bottom clears input bar */
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+    .chat-header-info h2 { font-size: 1rem; font-weight: 700; }
+    .chat-header-info p  { font-size: 0.8125rem; color: var(--text-secondary); }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 70%;
+    }
+    .message.mine {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+    .message.theirs {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+    .message-bubble {
+      padding: 0.625rem 1rem;
+      border-radius: 18px;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+    .message.mine .message-bubble {
+      background: var(--color-primary);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .message.theirs .message-bubble {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-bottom-left-radius: 4px;
+    }
+    .message-meta {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+      padding: 0 0.25rem;
+    }
+    .chat-input-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 1rem;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border);
+    }
+    .chat-input-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.75rem;
+    }
+    .chat-input-inner input {
+      flex: 1;
+    }
+    .empty-chat {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 3rem 1rem;
+      font-size: 0.9375rem;
+    }
+    .empty-chat div { font-size: 2rem; margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="mesh-bg"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="navbar-brand">
+      <div class="logo-icon">⚡</div>
+      StackMate
+    </a>
+    <div class="navbar-links">
+      <a href="dashboard.html">Discover</a>
+      <a href="profile.html">Profile</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="chat-wrapper">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">← Back</a>
+      <div class="avatar" id="partner-avatar">?</div>
+      <div class="chat-header-info">
+        <h2 id="partner-name">Loading...</h2>
+        <p id="partner-role"></p>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="messages-container">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span>Loading messages...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Bar -->
+  <div class="chat-input-bar">
+    <div class="chat-input-inner">
+      <input
+        class="form-input"
+        type="text"
+        id="message-input"
+        placeholder="Type a message..."
+        autocomplete="off"
+        onkeydown="handleKey(event)"
+      />
+      <button class="btn btn-primary" onclick="sendMessage()">Send →</button>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>
