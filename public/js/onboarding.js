@@ -22,6 +22,16 @@ async function apiFetch(path, options = {}) {
 if (!getToken()) window.location.href = 'auth.html';
 const user = getUser();
 
+// If already onboarded, go to dashboard
+(async () => {
+  try {
+    const profile = await apiFetch('/api/profile/me');
+    if (profile && profile.onboardingComplete) {
+      window.location.href = 'dashboard.html';
+    }
+  } catch(e) { /* let them continue if check fails */ }
+})();
+
 /* ── State ── */
 let currentStep = 1;
 const totalSteps = 5;

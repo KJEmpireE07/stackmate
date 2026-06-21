@@ -40,6 +40,25 @@
     .skills-section h3 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 1rem; }
     .tags-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
+    /* AI explanation card */
+    .ai-card {
+      background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(139,92,246,0.04));
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .ai-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .ai-card-title { font-size: 1rem; font-weight: 700; }
+    .ai-text {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: 0.9375rem;
+      font-style: italic;
+    }
     @media (max-width: 768px) { .info-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -101,8 +120,17 @@
 
         <!-- Match Breakdown -->
         <div class="match-breakdown-card" id="breakdown-card" style="display:none;">
-          <h3>📊 Why You Match</h3>
+          <h3>📊 Match Score Breakdown</h3>
           <div id="pp-breakdown"></div>
+        </div>
+
+        <!-- AI Explanation -->
+        <div class="ai-card" id="ai-card" style="display:none;">
+          <div class="ai-card-header">
+            <span class="ai-card-title">🤖 Why You Match</span>
+            <button class="btn btn-outline btn-sm" id="ai-btn" onclick="generateExplanation()">✨ Generate AI Explanation</button>
+          </div>
+          <div id="ai-text" class="ai-text" style="display:none;"></div>
         </div>
 
         <!-- Info Grid -->

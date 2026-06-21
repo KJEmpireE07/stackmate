@@ -99,4 +99,47 @@ router.put('/respond', auth, async (req, res) => {
   }
 });
 
+// DELETE /api/connect/:id  — remove an accepted connection
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const connection = await Connection.findOne({
+      _id: req.params.id,
+      $or: [{ from: req.user.id }, { to: req.user.id }],
+      status: 'accepted'
+    });
+    if (!connection) return res.status(404).json({ message: 'Connection not found' });
+    await connection.deleteOne();
+    res.json({ message: 'Connection removed' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// DELETE /api/connect/cancel/:id  — cancel a pending sent request
+router.delete('/cancel/:id', auth, async (req, res) => {
+  try {
+    const connection = await Connection.findOne({
+      _id: req.params.id,
+      from: req.user.id,
+      status: 'pending'
+    });
+    if (!connection) return res.status(404).json({ message: 'Request not found' });
+    await connection.deleteOne();
+    res.json({ message: 'Request cancelled' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// GET /api/connect/sent  — outgoing pending requests
+router.get('/sent', auth, async (req, res) => {
+  try {
+    const sent = await Connection.find({ from: req.user.id, status: 'pending' })
+      .populate('to', 'name program university year');
+    res.json(sent);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

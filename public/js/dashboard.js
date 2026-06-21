@@ -88,6 +88,19 @@ async function loadConnections() {
   } catch (e) { /* silent */ }
 }
 
+/* ── Remove Connection ── */
+async function removeConnection(connectionId) {
+  if (!confirm('Remove this connection? This frees up a slot but cannot be undone.')) return;
+  try {
+    await apiFetch(`/api/connect/${connectionId}`, { method: 'DELETE' });
+    showToast('Connection removed.', 'info');
+    loadConnections();
+    loadMatches(); // refresh so they appear again
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
 /* ── Render Connections ── */
 function renderConnections(connections) {
   const section = document.getElementById('connections-section');
@@ -101,21 +114,25 @@ function renderConnections(connections) {
   }
 
   section.style.display = 'block';
-  count.textContent = connections.length;
+  count.textContent = `${connections.length}/3`;
 
   grid.innerHTML = connections.map(c => {
-    // Pick the partner (the other side of the connection)
     const partner = c.from._id === myId || c.from === myId ? c.to : c.from;
     const initials = partner.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
     const meta = [partner.program, partner.year ? `Year ${partner.year}` : ''].filter(Boolean).join(' • ');
     return `
-      <a href="chat.html?connectionId=${c._id}&partnerId=${partner._id}" class="connection-pill">
-        <div class="avatar">${initials}</div>
-        <div>
-          <div class="connection-pill-name">${partner.name}</div>
-          ${meta ? `<div class="connection-pill-meta">${meta} • 💬 Chat</div>` : '<div class="connection-pill-meta">💬 Chat</div>'}
-        </div>
-      </a>
+      <div class="connection-pill" style="position:relative;">
+        <a href="chat.html?connectionId=${c._id}&partnerId=${partner._id}" style="display:flex;align-items:center;gap:0.75rem;flex:1;text-decoration:none;">
+          <div class="avatar">${initials}</div>
+          <div>
+            <div class="connection-pill-name">${partner.name}</div>
+            ${meta ? `<div class="connection-pill-meta">${meta} • 💬 Chat</div>` : '<div class="connection-pill-meta">💬 Chat</div>'}
+          </div>
+        </a>
+        <button onclick="removeConnection('${c._id}')" title="Remove connection"
+          style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;padding:0.25rem 0.5rem;border-radius:6px;"
+          onmouseenter="this.style.color='#ef4444'" onmouseleave="this.style.color='var(--text-muted)'">✕</button>
+      </div>
     `;
   }).join('');
 }
@@ -124,6 +141,47 @@ function renderConnections(connections) {
 function toggleRequests() {
   const panel = document.getElementById('requests-panel');
   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  if (panel.style.display === 'block') loadSentRequests();
+}
+
+/* ── Load Sent Requests ── */
+async function loadSentRequests() {
+  try {
+    const sent = await apiFetch('/api/connect/sent');
+    renderSentRequests(sent);
+  } catch (e) { /* silent */ }
+}
+
+/* ── Render Sent Requests ── */
+function renderSentRequests(sent) {
+  let el = document.getElementById('sent-requests-section');
+  if (!el) return;
+  if (!sent || sent.length === 0) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  document.getElementById('sent-list').innerHTML = sent.map(s => `
+    <div class="request-item" id="sent-${s._id}">
+      <div class="avatar">${s.to.name[0].toUpperCase()}</div>
+      <div class="request-item-info">
+        <div class="request-item-name">${s.to.name}</div>
+        <div class="request-item-meta">${s.to.program || ''}${s.to.university ? ' • ' + s.to.university : ''} • ⏳ Pending</div>
+      </div>
+      <div class="request-actions">
+        <button class="btn btn-ghost btn-sm" onclick="cancelRequest('${s._id}')">Cancel</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Cancel Sent Request ── */
+async function cancelRequest(connectionId) {
+  try {
+    await apiFetch(`/api/connect/cancel/${connectionId}`, { method: 'DELETE' });
+    document.getElementById(`sent-${connectionId}`)?.remove();
+    showToast('Request cancelled.', 'info');
+    loadMatches(); // they reappear in matches
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
 }
 
 /* ── Render Requests ── */
@@ -217,11 +275,18 @@ function renderMatches() {
   }
 
   if (!filtered.length) {
+    const isAtLimit = document.getElementById('limit-banner')?.style.display !== 'none';
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1;">
         <div class="empty-state-icon">🔍</div>
-        <h3>No matches found</h3>
-        <p>Try changing your filter, or check back as more users join!</p>
+        <h3>${isAtLimit ? 'No new connections available' : 'No matches found'}</h3>
+        <p>${
+          isAtLimit
+            ? 'You have 3 connections. Remove one to discover new partners.'
+            : activeFilter !== 'all'
+              ? 'No one with that goal yet — try a different filter or check back later.'
+              : 'No other students found yet. Invite a friend to join StackMate!'
+        }</p>
       </div>`;
     return;
   }
@@ -333,8 +398,10 @@ async function sendConnect(userId, btn) {
   try {
     await apiFetch('/api/connect/request', { method: 'POST', body: { to: userId } });
     btn.textContent = '✓ Sent';
+    btn.dataset.sent = 'true';
     btn.classList.remove('btn-primary');
     btn.classList.add('btn-ghost');
+    btn.onclick = null; // prevent double send
     showToast('Connection request sent! 🚀', 'success');
   } catch (err) {
     btn.disabled = false;
@@ -344,6 +411,24 @@ async function sendConnect(userId, btn) {
 }
 
 /* ── Init ── */
-loadMatches();
-loadRequests();
-loadConnections();
+async function init() {
+  await loadMatches();
+  await loadRequests();
+  await loadConnections();
+
+  // Mark cards where request already sent
+  try {
+    const sent = await apiFetch('/api/connect/sent');
+    sent.forEach(s => {
+      const btn = document.querySelector(`button[onclick*="sendConnect('${s.to._id || s.to}']"]`);
+      if (btn) {
+        btn.textContent = '✓ Sent';
+        btn.disabled = true;
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-ghost');
+      }
+    });
+  } catch(e) { /* silent */ }
+}
+
+init();

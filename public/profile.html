@@ -165,6 +165,14 @@
           <label class="form-label">Bio</label>
           <textarea class="form-input form-textarea" id="edit-bio" placeholder="Short bio about yourself..."></textarea>
         </div>
+        <div class="form-group">
+          <label class="form-label">Skills I Have <span style="color:var(--text-muted);font-weight:400;font-size:0.8125rem;">(comma separated)</span></label>
+          <input class="form-input" type="text" id="edit-skills" placeholder="e.g. React, Node.js, Python"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Currently Learning <span style="color:var(--text-muted);font-weight:400;font-size:0.8125rem;">(comma separated)</span></label>
+          <input class="form-input" type="text" id="edit-learning" placeholder="e.g. Machine Learning, Flutter"/>
+        </div>
         <div id="edit-error" class="form-error"></div>
         <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
           <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>

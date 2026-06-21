@@ -41,6 +41,14 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Typing indicators — broadcast to others in the room only
+  socket.on('typing', ({ roomId }) => {
+    socket.to(roomId).emit('userTyping');
+  });
+  socket.on('stopTyping', ({ roomId }) => {
+    socket.to(roomId).emit('userStopTyping');
+  });
+
 });
 
 app.use(cors());
@@ -54,10 +62,11 @@ app.use('/api/match', require('./routes/match'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/connect', require('./routes/connect'));
 app.use('/api/chat',    require('./routes/chat'));
+app.use('/api/ai',      require('./routes/ai'));
 
-// Fallback — serve index.html for any unknown routes
+// Fallback — serve 404 page for unknown routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 mongoose.connect(process.env.MONGO_URI)

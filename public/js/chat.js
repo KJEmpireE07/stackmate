@@ -55,6 +55,23 @@ socket.on('newMessage', (message) => {
   scrollToBottom();
 });
 
+/* ── Typing indicator ── */
+let typingTimeout;
+function onTyping() {
+  socket.emit('typing', { roomId: connectionId, senderId: me?.id });
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    socket.emit('stopTyping', { roomId: connectionId });
+  }, 2000);
+}
+
+socket.on('userTyping', () => {
+  document.getElementById('typing-indicator').style.display = 'block';
+});
+socket.on('userStopTyping', () => {
+  document.getElementById('typing-indicator').style.display = 'none';
+});
+
 /* ── Load partner info & message history ── */
 async function init() {
   try {
@@ -68,7 +85,8 @@ async function init() {
     document.getElementById('partner-avatar').textContent = initials;
     document.getElementById('partner-name').textContent = partner.name;
     document.getElementById('partner-role').textContent =
-      (partner.program || '') + (partner.year ? ` • Year ${partner.year}` : '');
+      (partner.program || '') + (partner.year ? ` • Year ${partner.year}` : '') + ' — View Profile →';
+    document.getElementById('partner-profile-link').href = `partner.html?id=${partnerId}`;
 
     // Render history
     const container = document.getElementById('messages-container');
@@ -128,6 +146,7 @@ function sendMessage() {
 
 /* ── Send on Enter key ── */
 function handleKey(e) {
+  onTyping();
   if (e.key === 'Enter') sendMessage();
 }
 

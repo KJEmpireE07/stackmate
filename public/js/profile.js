@@ -91,12 +91,14 @@ function renderProfile() {
 /* ── Edit Modal ── */
 function openEditModal() {
   const u = profileData;
-  document.getElementById('edit-name').value = u.name || '';
-  document.getElementById('edit-program').value = u.program || '';
-  document.getElementById('edit-year').value = u.year || 1;
+  document.getElementById('edit-name').value       = u.name || '';
+  document.getElementById('edit-program').value    = u.program || '';
+  document.getElementById('edit-year').value       = u.year || 1;
   document.getElementById('edit-university').value = u.university || '';
-  document.getElementById('edit-hours').value = u.hoursPerWeek || '';
-  document.getElementById('edit-bio').value = u.bio || '';
+  document.getElementById('edit-hours').value      = u.hoursPerWeek || '';
+  document.getElementById('edit-bio').value        = u.bio || '';
+  document.getElementById('edit-skills').value     = (u.skills || []).join(', ');
+  document.getElementById('edit-learning').value   = (u.learning || []).join(', ');
   document.getElementById('edit-error').classList.remove('visible');
   document.getElementById('edit-modal').style.display = 'flex';
 }
@@ -114,13 +116,20 @@ async function saveProfile() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Saving...';
 
+  const parseTags = id => document.getElementById(id).value
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
   const updates = {
-    name:        document.getElementById('edit-name').value.trim(),
-    program:     document.getElementById('edit-program').value.trim(),
-    year:        parseInt(document.getElementById('edit-year').value),
-    university:  document.getElementById('edit-university').value.trim(),
+    name:         document.getElementById('edit-name').value.trim(),
+    program:      document.getElementById('edit-program').value.trim(),
+    year:         parseInt(document.getElementById('edit-year').value),
+    university:   document.getElementById('edit-university').value.trim(),
     hoursPerWeek: parseInt(document.getElementById('edit-hours').value) || profileData.hoursPerWeek,
-    bio:         document.getElementById('edit-bio').value.trim()
+    bio:          document.getElementById('edit-bio').value.trim(),
+    skills:       parseTags('edit-skills'),
+    learning:     parseTags('edit-learning')
   };
   if (!updates.name) { errEl.textContent = 'Name is required.'; errEl.classList.add('visible'); btn.disabled=false; btn.textContent='Save Changes'; return; }
 

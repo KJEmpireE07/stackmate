@@ -168,11 +168,17 @@
       <!-- Connection Requests Panel (hidden by default) -->
       <div class="requests-panel" id="requests-panel" style="display:none;">
         <div class="requests-panel-title">
-          🔔 Incoming Connection Requests
-          <button class="btn btn-ghost btn-sm" onclick="toggleRequests()" style="margin-left:auto;">Close</button>
+          🔔 Incoming Requests
+          <button class="btn btn-ghost btn-sm" onclick="toggleRequests()" style="margin-left:auto;">Close ✕</button>
         </div>
         <div id="requests-list">
           <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+
+        <!-- Sent requests sub-section -->
+        <div id="sent-requests-section" style="display:none;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);">
+          <div style="font-size:0.8125rem;font-weight:700;color:var(--text-secondary);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.05em;">⏳ Sent Requests</div>
+          <div id="sent-list"></div>
         </div>
       </div>
 

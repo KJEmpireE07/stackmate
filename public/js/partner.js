@@ -148,6 +148,7 @@ async function loadPartner() {
 
       // Breakdown
       document.getElementById('breakdown-card').style.display = 'block';
+      document.getElementById('ai-card').style.display = 'block';
       const factors = [
         { label:'Complementary Skills', val: bd.skills, max: 30 },
         { label:'Goal Alignment',       val: bd.goals,  max: 25 },
@@ -196,6 +197,31 @@ async function sendConnect() {
     btn.disabled = false;
     btn.textContent = 'Connect →';
     showToast(err.message, 'error');
+  }
+}
+
+/* ── AI Explanation ── */
+async function generateExplanation() {
+  const btn    = document.getElementById('ai-btn');
+  const textEl = document.getElementById('ai-text');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;"></span> Generating...';
+  textEl.style.display = 'none';
+
+  try {
+    const data = await apiFetch('/api/ai/explain', {
+      method: 'POST',
+      body: { partnerId }
+    });
+    textEl.textContent = data.explanation;
+    textEl.style.display = 'block';
+    btn.textContent = '🔄 Regenerate';
+    btn.disabled = false;
+  } catch (err) {
+    showToast(err.message, 'error');
+    btn.textContent = '✨ Generate AI Explanation';
+    btn.disabled = false;
   }
 }
 
