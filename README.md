@@ -1,7 +1,7 @@
 # StackMate 🤝
 > Find your perfect coding partner — built for college students.
 
-**Live Demo:** [Coming soon — deploying in Week 7]  
+**Live Demo:** [https://stackmate-98sm.onrender.com](https://stackmate-98sm.onrender.com)  
 **Built by:** [Krish Jaiswal]
 
 ---
