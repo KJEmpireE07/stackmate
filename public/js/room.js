@@ -623,13 +623,15 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft'  || e.key === 'a') x -= 1;
     if (e.key === 'ArrowRight' || e.key === 'd') x += 1;
 
-    // Zone A: own desk area | Zone B: discussion area
-    const inDeskA      = x >= 1  && x <= 6  && y >= 2 && y <= 6;
-    const inDeskB      = x >= 15 && x <= 21 && y >= 2 && y <= 6;
-    const inDiscussion = x >= 7  && x <= 14 && y >= 5 && y <= 11;
-    const ownDesk      = isPlayerA ? inDeskA : inDeskB;
+    // Block walls and out of bounds
+    if (x < 0 || x >= COLS || y < 1 || y >= ROWS) return;
 
-    if (ownDesk || inDiscussion) {
+    // Block partner's private desk area
+    const inPartnerDesk = isPlayerA
+      ? (x >= 15 && x <= 21 && y >= 1 && y <= 5)  // Player A blocked from right desk
+      : (x >= 1  && x <= 6  && y >= 1 && y <= 5); // Player B blocked from left desk
+
+    if (!inPartnerDesk) {
       myPos = { x, y };
       drawRoom();
       socket.emit('roomMove', { roomId: connectionId, position: myPos });
