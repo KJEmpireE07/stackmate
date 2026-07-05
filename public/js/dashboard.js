@@ -121,17 +121,27 @@ function renderConnections(connections) {
     const initials = partner.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
     const meta = [partner.program, partner.year ? `Year ${partner.year}` : ''].filter(Boolean).join(' • ');
     return `
-      <div class="connection-pill" style="position:relative;">
-        <a href="chat.html?connectionId=${c._id}&partnerId=${partner._id}" style="display:flex;align-items:center;gap:0.75rem;flex:1;text-decoration:none;">
+      <div class="connection-pill" style="position:relative;flex-direction:column;align-items:stretch;gap:0.5rem;padding:0.75rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
           <div class="avatar">${initials}</div>
-          <div>
+          <div style="flex:1;">
             <div class="connection-pill-name">${partner.name}</div>
-            ${meta ? `<div class="connection-pill-meta">${meta} • 💬 Chat</div>` : '<div class="connection-pill-meta">💬 Chat</div>'}
+            ${meta ? `<div class="connection-pill-meta">${meta}</div>` : ''}
           </div>
-        </a>
-        <button onclick="removeConnection('${c._id}')" title="Remove connection"
-          style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;padding:0.25rem 0.5rem;border-radius:6px;"
-          onmouseenter="this.style.color='#ef4444'" onmouseleave="this.style.color='var(--text-muted)'">✕</button>
+          <button onclick="removeConnection('${c._id}')" title="Remove connection"
+            style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1rem;padding:0.25rem;"
+            onmouseenter="this.style.color='#ef4444'" onmouseleave="this.style.color='var(--text-muted)'">✕</button>
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+          <a href="room.html?connectionId=${c._id}&partnerId=${partner._id}"
+            class="btn btn-primary btn-sm" style="flex:1;text-align:center;text-decoration:none;">
+            🏠 Enter Room
+          </a>
+          <a href="chat.html?connectionId=${c._id}&partnerId=${partner._id}"
+            class="btn btn-ghost btn-sm" style="flex:1;text-align:center;text-decoration:none;">
+            💬 Chat
+          </a>
+        </div>
       </div>
     `;
   }).join('');

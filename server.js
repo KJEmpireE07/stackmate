@@ -49,6 +49,27 @@ io.on('connection', (socket) => {
     socket.to(roomId).emit('userStopTyping');
   });
 
+  // Virtual room — presence events
+  socket.on('roomJoin', ({ roomId, userId, position, status }) => {
+    socket.join(roomId);
+    socket.to(roomId).emit('partnerJoined', { userId, position, status });
+  });
+
+  socket.on('roomMove', ({ roomId, position }) => {
+    socket.to(roomId).emit('partnerMoved', { position });
+  });
+
+  socket.on('roomStatus', ({ roomId, status }) => {
+    socket.to(roomId).emit('partnerStatus', { status });
+  });
+
+  socket.on('disconnect', () => {
+    // Notify all rooms this socket was in
+    socket.rooms.forEach(room => {
+      socket.to(room).emit('partnerLeft');
+    });
+  });
+
 });
 
 app.use(cors());

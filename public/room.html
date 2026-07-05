@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StackMate — Virtual Room</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/room.css"/>
+</head>
+<body class="room-body">
+
+  <!-- Navbar -->
+  <nav class="room-nav">
+    <a href="index.html" class="navbar-brand">
+      <div class="logo-icon">⚡</div>StackMate
+    </a>
+    <div class="room-nav-center">
+      <span class="room-title" id="room-title">Loading room...</span>
+    </div>
+    <div class="room-nav-right">
+      <div class="status-selector">
+        <span class="status-dot" id="my-status-dot"></span>
+        <select id="status-select" onchange="setStatus(this.value)">
+          <option value="working">🟢 Working</option>
+          <option value="available">🔵 Available</option>
+          <option value="away">🟡 Away</option>
+          <option value="dnd">🔴 Do Not Disturb</option>
+        </select>
+      </div>
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">← Dashboard</a>
+    </div>
+  </nav>
+
+  <!-- Room Layout -->
+  <div class="room-layout">
+
+    <!-- Canvas Room -->
+    <div class="room-canvas-wrap">
+      <canvas id="room-canvas"></canvas>
+
+      <!-- Overlay: partner status -->
+      <div class="room-overlay" id="room-overlay">
+        <div class="partner-status-card" id="partner-status-card" style="display:none;">
+          <div class="partner-avatar-mini" id="partner-avatar-mini">?</div>
+          <div>
+            <div class="partner-name-mini" id="partner-name-mini">Partner</div>
+            <div class="partner-status-mini" id="partner-status-mini">● Offline</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Panel: Chat -->
+    <div class="room-side">
+      <div class="room-side-header">
+        <span>💬 Discussion</span>
+        <button class="btn btn-ghost btn-sm" onclick="toggleChat()">▾</button>
+      </div>
+      <div class="room-chat-messages" id="room-messages">
+        <div class="room-chat-empty">
+          <div style="font-size:2rem;">👋</div>
+          <p>Say hi to your partner!</p>
+        </div>
+      </div>
+      <div class="room-chat-input">
+        <input type="text" id="room-message-input"
+          placeholder="Type a message..."
+          onkeydown="if(event.key==='Enter') sendRoomMessage()"
+        />
+        <button class="btn btn-primary btn-sm" onclick="sendRoomMessage()">→</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/room.js"></script>
+</body>
+</html>
