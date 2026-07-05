@@ -635,6 +635,10 @@ const MOVE_ZONES = [
 ];
 
 document.addEventListener('keydown', (e) => {
+  // Don't move character when user is typing in the chat input
+  const active = document.activeElement;
+  if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT')) return;
+
   if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','a','s','d'].includes(e.key)) {
     e.preventDefault();
     let { x, y } = myPos;

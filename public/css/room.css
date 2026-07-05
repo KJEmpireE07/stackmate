@@ -309,3 +309,97 @@
 #room-canvas {
   animation: roomFadeIn 0.4s ease;
 }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+
+/* Tablet (≤ 1024px) — shrink side panel */
+@media (max-width: 1024px) {
+  .room-side {
+    width: 240px;
+  }
+  .room-nav-center {
+    display: none; /* hide workspace title to save space */
+  }
+}
+
+/* Mobile (≤ 768px) — stack vertically */
+@media (max-width: 768px) {
+  .room-body {
+    overflow: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  /* Compact navbar */
+  .room-nav {
+    padding: 0.5rem 0.75rem;
+    position: relative;
+  }
+  .room-nav .navbar-brand span,
+  .room-nav .logo-icon + span { display: none; }
+  .room-nav-center { display: none; }
+  .room-nav-right { gap: 0.5rem; }
+
+  /* Hide status label text, keep dot + select */
+  .status-selector {
+    padding: 0.2rem 0.5rem;
+  }
+
+  /* Stack layout: canvas on top, chat below */
+  .room-layout {
+    flex-direction: column;
+    height: auto;
+  }
+
+  /* Canvas area takes natural height */
+  .room-canvas-wrap {
+    height: 55vw;
+    min-height: 260px;
+    max-height: 420px;
+  }
+
+  #room-canvas {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+  }
+
+  /* Partner card — smaller */
+  .partner-status-card {
+    padding: 0.35rem 0.6rem;
+    gap: 0.4rem;
+  }
+  .partner-avatar-mini {
+    width: 22px;
+    height: 22px;
+    font-size: 0.5625rem;
+  }
+  .partner-name-mini  { font-size: 0.75rem; }
+  .partner-status-mini { font-size: 0.625rem; }
+
+  /* Side panel becomes bottom panel */
+  .room-side {
+    width: 100%;
+    border-left: none;
+    border-top: 2px solid #3d2b1a;
+    height: 45vh;
+    min-height: 220px;
+  }
+
+  .room-chat-messages {
+    max-height: calc(45vh - 90px);
+  }
+}
+
+/* Very small screens (≤ 400px) */
+@media (max-width: 400px) {
+  .room-canvas-wrap {
+    height: 60vw;
+  }
+  .status-selector select {
+    font-size: 0.6875rem;
+  }
+}
