@@ -477,7 +477,7 @@ function drawCharacter(tileX, tileY, color, label, status) {
   ctx.fillRect(cx - 4, cy - 3, 3, 3);
   ctx.fillRect(cx + 2, cy - 3, 3, 3);
 
-  // Status dot above head
+  // Status colours and emoji map
   const statusColors = {
     working:   '#22c55e',
     available: '#3b82f6',
@@ -485,6 +485,15 @@ function drawCharacter(tileX, tileY, color, label, status) {
     dnd:       '#ef4444',
     offline:   '#6b7280'
   };
+  const statusEmoji = {
+    working:   '🟢',
+    available: '🔵',
+    away:      '🟡',
+    dnd:       '🔴',
+    offline:   '⚫'
+  };
+
+  // Status dot above head
   ctx.fillStyle = statusColors[status] || '#6b7280';
   ctx.beginPath();
   ctx.arc(cx + size / 2 - 2, cy - size / 2 - 2, 4, 0, Math.PI * 2);
@@ -493,16 +502,17 @@ function drawCharacter(tileX, tileY, color, label, status) {
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // Name tag
-  const tagW = ctx.measureText(label).width + 10;
+  // Name tag — shows name + status emoji
+  ctx.font = 'bold 9px monospace';
+  const tagLine = `${label} ${statusEmoji[status] || '⚫'}`;
+  const tagW    = ctx.measureText(tagLine).width + 10;
   ctx.fillStyle = C.nameTag;
   ctx.beginPath();
-  ctx.roundRect(cx - tagW / 2, cy - size / 2 - 20, tagW, 14, 4);
+  ctx.roundRect(cx - tagW / 2, cy - size / 2 - 22, tagW, 15, 4);
   ctx.fill();
   ctx.fillStyle = '#e8c99a';
-  ctx.font = '9px monospace';
   ctx.textAlign = 'center';
-  ctx.fillText(label, cx, cy - size / 2 - 9);
+  ctx.fillText(tagLine, cx, cy - size / 2 - 11);
   ctx.textAlign = 'left';
 }
 
@@ -537,7 +547,7 @@ function drawRoom() {
   ctx.fillText('Discussion Area', (POS.table.x + POS.table.w / 2) * TILE, (POS.table.y + POS.table.h + 0.6) * TILE);
   ctx.textAlign = 'left';
 
-  // Draw my character
+  // Draw my character — always on left desk
   drawCharacter(
     myPos.x, myPos.y,
     myProfile?.characterColor || C.charA,
@@ -545,10 +555,11 @@ function drawRoom() {
     myStatus
   );
 
-  // Draw partner character if online
+  // Draw partner character — mirror their X to the right side
   if (partnerOnline) {
+    const mirrorX = (COLS - 1) - partnerPos.x;
     drawCharacter(
-      partnerPos.x, partnerPos.y,
+      mirrorX, partnerPos.y,
       partnerProfile?.characterColor || C.charB,
       (partnerProfile?.name?.split(' ')[0] || 'Partner'),
       partnerStatus
@@ -572,12 +583,21 @@ socket.on('connect', () => {
 
 // Partner joins
 socket.on('partnerJoined', ({ position, status }) => {
-  partnerOnline = true;
-  partnerPos = position || { ...POS.charB };
-  partnerStatus = status || 'available';
+  partnerOnline  = true;
+  partnerPos     = position || { ...POS.charB };
+  partnerStatus  = status || 'available';
   updatePartnerCard();
   drawRoom();
   showToast(`${partnerProfile?.name?.split(' ')[0] || 'Partner'} joined the room 👋`, 'success');
+});
+
+// When someone new joins, re-announce myself using roomAnnounce (not roomJoin — avoids loop)
+socket.on('requestAnnounce', () => {
+  socket.emit('roomAnnounce', {
+    roomId:   connectionId,
+    position: myPos,
+    status:   myStatus
+  });
 });
 
 // Partner leaves
@@ -626,11 +646,8 @@ document.addEventListener('keydown', (e) => {
     // Block walls and out of bounds
     if (x < 0 || x >= COLS || y < 1 || y >= ROWS) return;
 
-    // Block partner's private desk area
-    const inPartnerDesk = isPlayerA
-      ? (x >= 15 && x <= 21 && y >= 1 && y <= 5)  // Player A blocked from right desk
-      : (x >= 1  && x <= 6  && y >= 1 && y <= 5); // Player B blocked from left desk
-
+    // Block the right desk area — that's always the partner's private zone
+    const inPartnerDesk = (x >= 15 && y >= 1 && y <= 5);
     if (!inPartnerDesk) {
       myPos = { x, y };
       drawRoom();
@@ -667,6 +684,7 @@ canvas.addEventListener('click', (e) => {
 /* ── Status ── */
 function setStatus(status) {
   myStatus = status;
+  sessionStorage.setItem(`room_status_${connectionId}`, status); // persist across refresh
   const dot = document.getElementById('my-status-dot');
   const colors = { working:'#22c55e', available:'#3b82f6', away:'#eab308', dnd:'#ef4444' };
   dot.style.background = colors[status] || '#22c55e';
@@ -758,10 +776,18 @@ async function init() {
     myProfile      = me2;
     partnerProfile = partner;
 
-    // Determine desk assignment: lower ID → left desk, higher ID → right desk
-    isPlayerA = (me?.id || '') < (partnerId || '');
-    myPos      = { ...(isPlayerA ? POS.charA : POS.charB) };
-    partnerPos = { ...(isPlayerA ? POS.charB : POS.charA) };
+    // Everyone always starts at the LEFT desk from their own perspective
+    myPos      = { ...POS.charA };
+    partnerPos = { ...POS.charB };
+
+    // Restore status from last session
+    const savedStatus = sessionStorage.getItem(`room_status_${connectionId}`);
+    if (savedStatus) {
+      myStatus = savedStatus;
+      document.getElementById('status-select').value = savedStatus;
+      const colors = { working:'#22c55e', available:'#3b82f6', away:'#eab308', dnd:'#ef4444' };
+      document.getElementById('my-status-dot').style.background = colors[savedStatus] || '#22c55e';
+    }
 
     // Update room title
     document.getElementById('room-title').textContent =

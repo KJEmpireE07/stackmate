@@ -139,10 +139,14 @@ async function loadPartner() {
         });
         const btn = document.getElementById('connect-btn');
         if (existing && existing.status === 'accepted') {
-          btn.textContent = '💬 Open Chat';
-          btn.onclick = () => {
-            window.location.href = `chat.html?connectionId=${existing._id}&partnerId=${partnerId}`;
-          };
+          btn.outerHTML = `
+            <div style="display:flex;gap:0.5rem;">
+              <a href="room.html?connectionId=${existing._id}&partnerId=${partnerId}"
+                class="btn btn-primary">🏠 Enter Room</a>
+              <a href="chat.html?connectionId=${existing._id}&partnerId=${partnerId}"
+                class="btn btn-outline">💬 Chat</a>
+            </div>
+          `;
         }
       } catch(e) { /* silent */ }
 

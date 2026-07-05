@@ -53,6 +53,13 @@ io.on('connection', (socket) => {
   socket.on('roomJoin', ({ roomId, userId, position, status }) => {
     socket.join(roomId);
     socket.to(roomId).emit('partnerJoined', { userId, position, status });
+    // Ask existing members to re-announce — uses roomAnnounce to avoid loop
+    socket.to(roomId).emit('requestAnnounce');
+  });
+
+  // Re-announcement (one-way, doesn't trigger another requestAnnounce)
+  socket.on('roomAnnounce', ({ roomId, position, status }) => {
+    socket.to(roomId).emit('partnerJoined', { position, status });
   });
 
   socket.on('roomMove', ({ roomId, position }) => {
