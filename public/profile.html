@@ -173,6 +173,20 @@
           <label class="form-label">Currently Learning <span style="color:var(--text-muted);font-weight:400;font-size:0.8125rem;">(comma separated)</span></label>
           <input class="form-input" type="text" id="edit-learning" placeholder="e.g. Machine Learning, Flutter"/>
         </div>
+        <div class="form-group">
+          <label class="form-label">GitHub Profile URL</label>
+          <input class="form-input" type="url" id="edit-github" placeholder="https://github.com/yourusername"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Character Color <span style="color:var(--text-muted);font-weight:400;font-size:0.8125rem;">— shown in virtual room</span></label>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <input type="color" id="edit-character-color" value="#6366f1"
+              style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:2px;"/>
+            <div id="color-preview" style="flex:1;height:40px;border-radius:8px;background:#6366f1;transition:background 0.2s;display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:1.25rem;">🧑‍💻</span>
+            </div>
+          </div>
+        </div>
         <div id="edit-error" class="form-error"></div>
         <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
           <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>

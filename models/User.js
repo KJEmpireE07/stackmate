@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
 
   bio: { type: String, default: '' },
 
+  // Virtual room
+  github:         { type: String, default: '' },          // GitHub profile URL
+  characterColor: { type: String, default: '#6366f1' },   // Pixel character color
+  status:         { type: String, default: 'working' },   // Current status
+
   onboardingComplete: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });

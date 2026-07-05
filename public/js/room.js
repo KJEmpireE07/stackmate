@@ -540,7 +540,7 @@ function drawRoom() {
   // Draw my character
   drawCharacter(
     myPos.x, myPos.y,
-    C.charA,
+    myProfile?.characterColor || C.charA,
     (myProfile?.name?.split(' ')[0] || 'You'),
     myStatus
   );
@@ -549,7 +549,7 @@ function drawRoom() {
   if (partnerOnline) {
     drawCharacter(
       partnerPos.x, partnerPos.y,
-      C.charB,
+      partnerProfile?.characterColor || C.charB,
       (partnerProfile?.name?.split(' ')[0] || 'Partner'),
       partnerStatus
     );
