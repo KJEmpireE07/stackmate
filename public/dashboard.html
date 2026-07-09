@@ -5,179 +5,464 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>StackMate — Dashboard</title>
   <meta name="description" content="Find and connect with your perfect coding partner."/>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #ffffff;
+      color: #111;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; }
+
+    /* ── Dot grid background ── */
+    .dot-grid {
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ══════════════════════════════
+       NAVBAR
+    ══════════════════════════════ */
+    .nav-outer {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 200; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.625rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1.075rem;
+      background: white; border-radius: 14px; padding: 0.5rem 0.875rem;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .logo-icon {
+      width: 30px; height: 30px; background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 0.875rem;
+    }
+    .nav-pill {
+      display: flex; align-items: center; gap: 0.125rem;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 14px; padding: 5px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .nav-item {
+      padding: 0.4375rem 0.9375rem;
+      border-radius: 10px;
+      font-size: 0.875rem; font-weight: 600;
+      color: #555;
+      transition: color 0.18s, background 0.18s;
+    }
+    .nav-item:hover { color: #111; background: rgba(0,0,0,0.05); }
+    .nav-item.active { color: white; background: #111; }
+
+    .nav-actions {
+      display: flex; align-items: center; gap: 0.625rem;
+    }
+    .btn-notif {
+      position: relative;
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 12px; height: 40px; padding: 0 1rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8125rem; font-weight: 700; color: #555;
+      display: flex; align-items: center; gap: 0.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      transition: all 0.15s;
+    }
+    .btn-notif:hover { border-color: #111; color: #111; }
+    .notif-badge {
+      background: #ef4444; color: white;
+      font-size: 0.6875rem; font-weight: 700;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1;
+      position: absolute; top: -5px; right: -5px;
+      box-shadow: 0 2px 5px rgba(239,68,68,0.35);
+    }
+    .btn-logout {
+      background: transparent; color: #666;
+      font-size: 0.8125rem; font-weight: 600;
+      height: 40px; padding: 0 0.875rem;
+      transition: color 0.15s;
+      border-radius: 10px;
+    }
+    .btn-logout:hover { color: #ef4444; background: rgba(239,68,68,0.05); }
+
+    /* ══════════════════════════════
+       PAGE CONTENT
+    ══════════════════════════════ */
+    .page-wrapper {
+      flex: 1;
+      padding: 7.5rem 0 5rem;
+      position: relative; z-index: 1;
+    }
+    .container {
+      width: 100%; max-width: 1100px;
+      margin: 0 auto; padding: 0 1.5rem;
+    }
+
+    /* Dashboard Header */
     .dashboard-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+      margin-bottom: 2.25rem; gap: 1rem; flex-wrap: wrap;
     }
-    .dashboard-title { font-size: 1.75rem; font-weight: 800; }
-    .dashboard-subtitle { color: var(--text-secondary); font-size: 0.9375rem; margin-top: 0.25rem; }
-    .filter-bar {
-      display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;
-      padding: 1rem 1.25rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 1.5rem;
+    .dashboard-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.75rem, 3.5vw, 2.5rem); font-weight: 700;
+      letter-spacing: -0.03em; margin-bottom: 0.375rem;
     }
-    .filter-label { font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    .filter-chip {
-      padding: 0.35rem 0.75rem;
-      border: 1.5px solid var(--border);
-      border-radius: 100px;
-      font-size: 0.8125rem;
-      font-weight: 500;
-      cursor: pointer;
-      color: var(--text-secondary);
-      transition: var(--transition);
-      background: none;
+    .dashboard-subtitle {
+      font-size: 0.9375rem; color: #666; font-weight: 500;
     }
-    .filter-chip:hover, .filter-chip.active {
-      border-color: var(--color-primary);
-      color: var(--color-primary);
-      background: rgba(99,102,241,0.08);
-    }
-    .matches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
-    .match-score-label {
-      font-size: 0.7rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--text-muted); margin-top: 2px;
-    }
-    .breakdown-tooltip {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 1rem;
-      width: 220px;
-      z-index: 50;
-      box-shadow: var(--shadow-md);
-      display: none;
-    }
-    .score-wrap:hover .breakdown-tooltip { display: block; }
-    .score-wrap { position: relative; cursor: pointer; }
-    .notif-badge {
-      position: absolute;
-      top: -4px; right: -4px;
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: var(--color-danger);
-      font-size: 0.65rem;
-      font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      color: #fff;
-    }
-    .requests-panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .requests-panel-title {
-      font-size: 1rem; font-weight: 700; margin-bottom: 1rem;
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .request-item {
-      display: flex; align-items: center; gap: 1rem;
-      padding: 0.875rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .request-item:last-child { border-bottom: none; }
-    .request-item-info { flex: 1; }
-    .request-item-name { font-weight: 600; font-size: 0.9375rem; }
-    .request-item-meta { font-size: 0.8125rem; color: var(--text-secondary); }
-    .request-actions { display: flex; gap: 0.5rem; }
 
-    /* Connected partners section */
+    /* Standardized Buttons (JS Compatible) */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 11px; font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.8125rem; height: 38px;
+      padding: 0 1.125rem; transition: all 0.18s cubic-bezier(0.16,1,0.3,1);
+      border: none; text-decoration: none;
+    }
+    .btn-primary { background: #111; color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.12); }
+    .btn-primary:hover { background: #222; transform: translateY(-1px); }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-outline { background: white; color: #555; border: 1.5px solid #e5e5e0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .btn-outline:hover { border-color: #111; color: #111; }
+    .btn-outline:active { transform: scale(0.97); }
+
+    .btn-ghost { background: transparent; color: #666; }
+    .btn-ghost:hover { background: rgba(0,0,0,0.04); color: #111; }
+
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .btn-sm { height: 32px; padding: 0 0.875rem; font-size: 0.75rem; border-radius: 8px; }
+    .btn-lg { height: 46px; padding: 0 1.5rem; font-size: 0.9rem; border-radius: 12px; }
+
+    /* Connections pills */
     .connections-section {
-      margin-bottom: 2rem;
+      background: #fafafa; border: 1px solid #e5e5e0;
+      border-radius: 20px; padding: 1.25rem 1.5rem;
+      margin-bottom: 2.25rem;
     }
     .connections-section-header {
-      display: flex; align-items: center; gap: 0.75rem;
+      display: flex; align-items: center; gap: 0.625rem;
       margin-bottom: 1rem;
     }
     .connections-section-title {
-      font-size: 1rem; font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: #111;
     }
     .connections-count {
-      padding: 0.2rem 0.6rem;
-      background: rgba(16,185,129,0.15);
-      border: 1px solid rgba(16,185,129,0.25);
-      border-radius: 100px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--color-success);
+      background: #111; color: white;
+      font-size: 0.75rem; font-weight: 700;
+      padding: 0.2rem 0.5rem; border-radius: 6px;
     }
     .connections-grid {
       display: flex; flex-wrap: wrap; gap: 0.75rem;
     }
     .connection-pill {
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 12px; padding: 0.4375rem 0.875rem 0.4375rem 0.4375rem;
       display: flex; align-items: center; gap: 0.625rem;
-      padding: 0.5rem 1rem 0.5rem 0.5rem;
-      background: rgba(16,185,129,0.06);
-      border: 1px solid rgba(16,185,129,0.2);
-      border-radius: 100px;
-      transition: var(--transition);
-      text-decoration: none;
-      color: var(--text-primary);
+      transition: all 0.18s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      text-decoration: none; color: inherit;
     }
     .connection-pill:hover {
-      background: rgba(16,185,129,0.12);
-      border-color: rgba(16,185,129,0.4);
-      transform: translateY(-1px);
+      border-color: #111; transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     .connection-pill .avatar {
-      width: 32px; height: 32px; font-size: 0.875rem;
-      background: linear-gradient(135deg,#10b981,#06b6d4);
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
     }
-    .connection-pill-name { font-size: 0.875rem; font-weight: 600; }
-    .connection-pill-meta { font-size: 0.75rem; color: var(--text-secondary); }
+    .connection-pill-name { font-size: 0.8125rem; font-weight: 700; color: #111; }
+    .connection-pill-meta { font-size: 0.75rem; color: #888; font-weight: 500; }
+
+    /* Filters Bar */
+    .filter-bar {
+      display: flex; align-items: center; gap: 0.5rem;
+      flex-wrap: wrap; margin-bottom: 2.25rem;
+      padding-bottom: 1rem; border-bottom: 1px solid #e5e5e0;
+    }
+    .filter-label {
+      font-size: 0.8125rem; font-weight: 700; color: #888;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.5rem;
+    }
+    .filter-chip {
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 99px; padding: 0.375rem 0.875rem;
+      font-size: 0.8125rem; font-weight: 600; color: #555;
+      cursor: pointer; transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .filter-chip:hover { border-color: #111; color: #111; }
+    .filter-chip.active { border-color: #111; background: #111; color: white; }
+
+    /* Limit banner */
+    #limit-banner {
+      background: #fffbeb; border: 1px solid #fde68a;
+      border-radius: 16px; padding: 1rem 1.25rem;
+      margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 0.75rem;
+    }
+
+    /* Match Cards Grid */
+    .matches-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Single Match Card */
+    .match-card {
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 20px; padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      display: flex; flex-direction: column; justify-content: space-between;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+      position: relative;
+    }
+    .match-card:hover {
+      border-color: #111; transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    .match-card-header {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      margin-bottom: 1.125rem;
+    }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.875rem; flex-shrink: 0;
+    }
+    .match-card-info { flex: 1; min-width: 0; }
+    .match-card-info h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.0625rem; font-weight: 700; color: #111;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .match-card-info .meta {
+      font-size: 0.8125rem; color: #666; margin-top: 1px;
+      line-height: 1.4;
+    }
+
+    /* Score circle on card (JS dynamic svg render support) */
+    .score-wrap { position: relative; cursor: pointer; flex-shrink: 0; }
+    .score-ring-wrap {
+      position: relative; width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .score-ring {
+      width: 100%; height: 100%; transform: rotate(-90deg);
+    }
+    .score-ring-bg {
+      fill: none; stroke: #f0f0f0;
+    }
+    .score-ring-fill {
+      fill: none; stroke: #111; transition: stroke-dashoffset 0.8s ease;
+    }
+    .score-ring-text {
+      position: absolute; display: flex; flex-direction: column; align-items: center;
+      justify-content: center;
+    }
+    .score-ring-number {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.875rem; font-weight: 700;
+      color: #111; line-height: 1;
+    }
+    .score-ring-label {
+      font-size: 0.5rem; color: #999; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; margin-top: 1px;
+    }
+
+    /* Breakdown Tooltip */
+    .breakdown-tooltip {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 12px; padding: 0.875rem 1rem;
+      width: 230px; z-index: 100;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.04);
+      display: none;
+    }
+    .score-wrap:hover .breakdown-tooltip { display: block; }
+    .breakdown-item { margin-bottom: 0.5rem; }
+    .breakdown-item:last-child { margin-bottom: 0; }
+    .breakdown-label {
+      display: flex; justify-content: space-between; font-size: 0.75rem;
+      color: #666; margin-bottom: 3px; font-weight: 500;
+    }
+    .breakdown-label span:last-child { font-weight: 700; color: #111; }
+    .breakdown-bar-bg {
+      height: 4px; background: #f0f0f0; border-radius: 99px; overflow: hidden;
+    }
+    .breakdown-bar-fill {
+      height: 100%; background: #111; border-radius: 99px;
+    }
+
+    /* Match detail tags */
+    .match-card-tags { display: flex; flex-wrap: wrap; gap: 0.3125rem; margin-top: 0.5rem; }
+    .skill-tag {
+      padding: 0.2rem 0.5rem; border-radius: 6px;
+      background: #fafafa; border: 1px solid #e5e5e0;
+      font-size: 0.75rem; font-weight: 600; color: #444;
+      display: inline-block;
+    }
+
+    /* Goal/style badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      padding: 0.25rem 0.5rem; border-radius: 6px;
+      background: #fafafa; border: 1px solid #e5e5e0;
+      font-size: 0.75rem; font-weight: 600; color: #555;
+    }
+    .badge-primary { background: #111; color: white; border-color: #111; }
+    .badge-accent { background: #fafafa; border-color: #e5e5e0; color: #111; }
+
+    /* Card actions footer */
+    .match-card-footer {
+      display: flex; gap: 0.625rem; margin-top: 1rem;
+      border-top: 1px solid #f0f0f0; padding-top: 1rem;
+    }
+    .match-card-footer .btn { flex: 1; }
+
+    /* Requests Popover Panel */
+    .requests-panel {
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 20px; padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      animation: fadeUp 0.35s ease;
+    }
+    .requests-panel-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.0625rem; font-weight: 700; color: #111;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem; border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 0.5rem;
+    }
+    .request-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.75rem 0; border-bottom: 1px solid #f9f9f9;
+      gap: 1rem;
+    }
+    .request-item:last-child { border-bottom: none; }
+    .request-item-info { min-width: 0; flex: 1; }
+    .request-item-name { font-weight: 700; font-size: 0.875rem; color: #111; }
+    .request-item-meta { font-size: 0.75rem; color: #777; margin-top: 2px; }
+    .request-actions { display: flex; gap: 0.5rem; }
+
+    /* Loading states */
+    .loading-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 0.75rem; padding: 4rem 1rem;
+      color: #999; font-size: 0.875rem; font-weight: 500;
+    }
+    .loading-state .spinner {
+      width: 24px; height: 24px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-top-color: #111;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast Container */
+    #toast-container {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      z-index: 1000; display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .toast {
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 12px; padding: 0.75rem 1rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      font-size: 0.875rem; font-weight: 600; color: #111;
+      display: flex; align-items: center; gap: 0.5rem;
+      animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes toastIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Empty states */
+    .empty-state {
+      padding: 3rem 1.5rem; text-align: center;
+      color: #999; font-size: 0.875rem; font-weight: 500;
+      line-height: 1.6;
+    }
+    .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-pill { display: none; }
+      .dashboard-header { flex-direction: column; align-items: stretch; text-align: center; }
+      .dashboard-header .btn-white-sm { width: 100%; }
+      .request-item { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+      .request-actions { justify-content: flex-end; }
+    }
   </style>
 </head>
 <body>
-  <div class="mesh-bg"></div>
+
+  <!-- Dot Grid Background -->
+  <div class="dot-grid" aria-hidden="true"></div>
 
   <!-- Navbar -->
-  <nav class="navbar">
-    <a href="index.html" class="navbar-brand">
+  <nav class="nav-outer">
+    <a href="dashboard.html" class="nav-logo">
       <div class="logo-icon">⚡</div>
       StackMate
     </a>
-    <div class="navbar-links">
-      <a href="dashboard.html" class="active">Discover</a>
-      <a href="profile.html">Profile</a>
+
+    <div class="nav-pill">
+      <a href="dashboard.html" class="nav-item active">Discover</a>
+      <a href="profile.html" class="nav-item">Profile</a>
     </div>
-    <div class="navbar-actions">
+
+    <div class="nav-actions">
       <div style="position:relative;">
-        <button class="btn btn-outline btn-sm" id="notif-btn" onclick="toggleRequests()">
+        <button class="btn-notif" id="notif-btn" onclick="toggleRequests()">
           🔔 Requests
+          <span class="notif-badge" id="notif-badge" style="display:none;">0</span>
         </button>
-        <div class="notif-badge" id="notif-badge" style="display:none;">0</div>
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
     </div>
   </nav>
 
-  <div class="page-wrapper">
-    <div class="container" style="padding-top:2rem;padding-bottom:4rem;">
+  <!-- Page Main Content -->
+  <main class="page-wrapper">
+    <div class="container">
 
-      <!-- Connection Requests Panel (hidden by default) -->
+      <!-- Incoming & Sent Requests Panel -->
       <div class="requests-panel" id="requests-panel" style="display:none;">
         <div class="requests-panel-title">
-          🔔 Incoming Requests
-          <button class="btn btn-ghost btn-sm" onclick="toggleRequests()" style="margin-left:auto;">Close ✕</button>
+          Incoming Requests
+          <button class="btn btn-ghost btn-sm" onclick="toggleRequests()">Close ✕</button>
         </div>
         <div id="requests-list">
           <div class="loading-state"><div class="spinner"></div></div>
         </div>
 
-        <!-- Sent requests sub-section -->
-        <div id="sent-requests-section" style="display:none;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);">
-          <div style="font-size:0.8125rem;font-weight:700;color:var(--text-secondary);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.05em;">⏳ Sent Requests</div>
+        <div id="sent-requests-section" style="display:none;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #e5e5e0;">
+          <div style="font-size:0.75rem;font-weight:700;color:#aaa;margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.05em;">⏳ Sent Requests</div>
           <div id="sent-list"></div>
         </div>
       </div>
@@ -191,18 +476,20 @@
         <a href="profile.html" class="btn btn-outline">Edit Profile</a>
       </div>
 
-      <!-- My Connections (shown only if any exist) -->
+      <!-- My Connections Section (hidden unless loaded by JS) -->
       <div class="connections-section" id="connections-section" style="display:none;">
         <div class="connections-section-header">
-          <h2 class="connections-section-title">🤝 My Connections</h2>
+          <h2 class="connections-section-title">My Connections</h2>
           <span class="connections-count" id="connections-count">0</span>
         </div>
-        <div class="connections-grid" id="connections-grid"></div>
+        <div class="connections-grid" id="connections-grid">
+          <!-- Rendered by JS -->
+        </div>
       </div>
 
-      <!-- Filters -->
+      <!-- Filters Row -->
       <div class="filter-bar">
-        <span class="filter-label">Goal:</span>
+        <span class="filter-label">Filter:</span>
         <button class="filter-chip active" data-filter="all" onclick="setFilter('all', this)">All</button>
         <button class="filter-chip" data-filter="hackathon" onclick="setFilter('hackathon', this)">⚡ Hackathon</button>
         <button class="filter-chip" data-filter="project" onclick="setFilter('project', this)">🛠 Project</button>
@@ -210,24 +497,25 @@
         <button class="filter-chip" data-filter="freelance" onclick="setFilter('freelance', this)">💰 Freelance</button>
       </div>
 
-      <!-- At-limit banner (hidden by default) -->
-      <div id="limit-banner" style="display:none;align-items:center;gap:0.75rem;padding:1rem 1.25rem;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);border-radius:var(--radius);margin-bottom:1.5rem;">
+      <!-- At Limit Warning Banner -->
+      <div id="limit-banner" style="display:none;">
         <span style="font-size:1.25rem;">🔒</span>
         <div>
-          <div style="font-weight:700;color:#fcd34d;font-size:0.9375rem;">You've reached your connection limit (3/3)</div>
-          <div style="font-size:0.8125rem;color:var(--text-secondary);margin-top:0.125rem;">You can still discover people, but you'll need to remove a connection before adding a new one.</div>
+          <div style="font-weight:700;color:#92400e;font-size:0.875rem;">You've reached your connection limit (3/3)</div>
+          <div style="font-size:0.8125rem;color:#b45309;margin-top:0.125rem;">You can still discover matches, but you'll need to remove an active connection before sending new requests.</div>
         </div>
       </div>
 
-      <!-- Match Cards -->
+      <!-- Matches Cards Grid -->
       <div id="matches-grid" class="matches-grid">
         <div class="loading-state" style="grid-column:1/-1;">
           <div class="spinner"></div>
           <span>Finding your matches...</span>
         </div>
       </div>
+
     </div>
-  </div>
+  </main>
 
   <div id="toast-container"></div>
 
