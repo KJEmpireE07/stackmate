@@ -448,21 +448,11 @@
 
   <script src="js/auth.js"></script>
   <script>
-    // Override switchTab to also update heading + footer link
-    const _origSwitch = switchTab;
-    function switchTab(mode) {
-      _origSwitch(mode);
-      const isLogin = mode === 'login';
-      document.getElementById('form-title').textContent    = isLogin ? 'Welcome back'  : 'Create account';
-      document.getElementById('form-subtitle').textContent = isLogin ? 'Sign in to your StackMate account.' : 'Join and find your coding partner.';
-      document.getElementById('auth-footer-link').innerHTML = isLogin
-        ? `Don't have an account? <a href="#" onclick="switchTab('register');return false;">Register free</a>`
-        : `Already have an account? <a href="#" onclick="switchTab('login');return false;">Sign in</a>`;
-    }
-
     // Check URL param on load
     const p = new URLSearchParams(window.location.search);
-    if (p.get('mode') === 'register') switchTab('register');
+    if (p.get('mode') === 'register') {
+      switchTab('register');
+    }
   </script>
 </body>
 </html>

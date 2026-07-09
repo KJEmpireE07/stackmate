@@ -30,10 +30,34 @@ async function apiFetch(path, options = {}) {
 
 /* ── Auth page logic ── */
 function switchTab(tab) {
-  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
-  document.getElementById('panel-login').classList.toggle('active', tab === 'login');
-  document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+  const isLogin = tab === 'login';
+  
+  const tabLogin = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
+  const panelLogin = document.getElementById('panel-login');
+  const panelRegister = document.getElementById('panel-register');
+  
+  if (tabLogin) tabLogin.classList.toggle('active', isLogin);
+  if (tabRegister) tabRegister.classList.toggle('active', !isLogin);
+  if (panelLogin) panelLogin.classList.toggle('active', isLogin);
+  if (panelRegister) panelRegister.classList.toggle('active', !isLogin);
+  
+  const formTitle = document.getElementById('form-title');
+  const formSubtitle = document.getElementById('form-subtitle');
+  const authFooterLink = document.getElementById('auth-footer-link');
+  
+  if (formTitle) {
+    formTitle.textContent = isLogin ? 'Welcome back' : 'Create account';
+  }
+  if (formSubtitle) {
+    formSubtitle.textContent = isLogin ? 'Sign in to your StackMate account.' : 'Join and find your coding partner.';
+  }
+  if (authFooterLink) {
+    authFooterLink.innerHTML = isLogin
+      ? `Don't have an account? <a href="#" id="footer-switch-link" onclick="switchTab('register'); return false;">Register free</a>`
+      : `Already have an account? <a href="#" id="footer-switch-link" onclick="switchTab('login'); return false;">Sign in</a>`;
+  }
+  
   hideError();
 }
 
