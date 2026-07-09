@@ -1,414 +1,1147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>StackMate — Find Your Perfect Coding Partner</title>
-  <meta name="description" content="StackMate connects college students with the perfect coding partner based on skills, goals, and work style. Smart matching for hackathons, projects, and beyond."/>
-  <link rel="stylesheet" href="css/style.css"/>
+  <title>StackMate — Find Your Coding Partner</title>
+  <meta name="description" content="Match with college students who complement your skills. Build real projects, real teams, real connections."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
-    /* ── Hero ─────────────────────────────────────── */
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #ffffff;
+      color: #111111;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+
+    /* ── Dot grid background ── */
+    .dot-grid {
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Container ── */
+    .wrap {
+      width: 100%; max-width: 1200px;
+      margin: 0 auto; padding: 0 1.5rem;
+    }
+
+    /* ── Typography ── */
+    .h-display {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+    .h-section {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+
+    /* ══════════════════════════════
+       NAVBAR
+    ══════════════════════════════ */
+    .nav-outer {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 200; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.625rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1.075rem;
+      background: white;
+      border-radius: 14px; padding: 0.5rem 0.875rem;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .nav-logo-icon {
+      width: 30px; height: 30px;
+      background: #111;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 0.875rem;
+    }
+    .nav-pill {
+      display: flex; align-items: center; gap: 0.125rem;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 14px; padding: 5px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .nav-item {
+      padding: 0.4375rem 0.9375rem;
+      border-radius: 10px;
+      font-size: 0.875rem; font-weight: 600;
+      color: #555;
+      transition: color 0.18s, background 0.18s;
+    }
+    .nav-item:hover  { color: #111; background: rgba(0,0,0,0.05); }
+    .nav-item.active { color: white; background: #111; }
+    .nav-cta {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: #111; color: white;
+      border-radius: 12px; padding: 0.5625rem 1.125rem;
+      font-size: 0.875rem; font-weight: 700;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+      transition: all 0.18s;
+    }
+    .nav-cta:hover { background: #222; transform: scale(0.97); }
+
+    /* ══════════════════════════════
+       HERO
+    ══════════════════════════════ */
     .hero {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding-top: 68px;
-      position: relative;
-      z-index: 1;
-      overflow: hidden;
-    }
-    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 4rem; }
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.375rem 0.875rem;
-      background: rgba(99,102,241,0.1);
-      border: 1px solid rgba(99,102,241,0.2);
-      border-radius: 100px;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      color: var(--color-primary);
-      margin-bottom: 1.5rem;
-    }
-    .hero-eyebrow span { width: 6px; height: 6px; border-radius: 50%; background: var(--color-primary); animation: blink 1.5s ease-in-out infinite; }
-    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
-    .hero-title { font-size: 4rem; font-weight: 900; line-height: 1.05; margin-bottom: 1.25rem; }
-    .hero-subtitle { font-size: 1.125rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 2rem; max-width: 480px; }
-    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .hero-stats { display: flex; gap: 2rem; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
-    .hero-stat-num { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); }
-    .hero-stat-label { font-size: 0.8125rem; color: var(--text-muted); }
-
-    /* ── Hero Visual ────────────────────────────────── */
-    .hero-visual { position: relative; }
-    .hero-card-stack { position: relative; height: 480px; }
-    .floating-card {
-      position: absolute;
-      background: rgba(255,255,255,0.04);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 1.25rem;
-    }
-    .main-match-card {
-      width: 300px; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 3;
-    }
-    .card-left { width: 240px; top: 20px; left: -20px; z-index: 2; opacity: 0.65; transform: rotate(-3deg); }
-    .card-right { width: 240px; bottom: 20px; right: -20px; z-index: 2; opacity: 0.65; transform: rotate(3deg); }
-    .match-percent {
-      font-size: 2rem; font-weight: 900;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .fc-name { font-weight: 700; font-size: 0.9375rem; margin-bottom: 0.25rem; }
-    .fc-meta { font-size: 0.75rem; color: var(--text-secondary); }
-    .fc-skills { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.75rem; }
-    .glow-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(60px);
-      pointer-events: none;
-    }
-    .orb1 { width: 300px; height: 300px; background: rgba(99,102,241,0.15); top: 10%; left: 10%; animation: float1 10s ease-in-out infinite; }
-    .orb2 { width: 200px; height: 200px; background: rgba(139,92,246,0.12); bottom: 10%; right: 10%; animation: float2 13s ease-in-out infinite; }
-    .pulse-ring {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 340px; height: 340px;
-      border-radius: 50%;
-      border: 1px solid rgba(99,102,241,0.15);
-      animation: pulse-out 3s ease-out infinite;
-      z-index: 1;
-    }
-    .pulse-ring:nth-child(2) { animation-delay: 1s; }
-    @keyframes pulse-out { 0% { transform: translate(-50%,-50%) scale(0.8); opacity: 0.5; } 100% { transform: translate(-50%,-50%) scale(1.3); opacity: 0; } }
-
-    /* ── Features ───────────────────────────────────── */
-    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-    .feature-card {
-      padding: 2rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      transition: var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-    .feature-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-4px); box-shadow: var(--shadow-glow); }
-    .feature-icon {
-      width: 52px; height: 52px; border-radius: var(--radius-sm);
-      background: rgba(99,102,241,0.12);
-      border: 1px solid rgba(99,102,241,0.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    .feature-title { font-size: 1.0625rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .feature-desc { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; }
-
-    /* ── How it works ───────────────────────────────── */
-    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; position: relative; }
-    .steps-grid::before {
-      content: '';
-      position: absolute;
-      top: 28px; left: calc(12.5% + 20px);
-      right: calc(12.5% + 20px);
-      height: 2px;
-      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-      opacity: 0.3;
-    }
-    .step-card { text-align: center; position: relative; }
-    .step-num {
-      width: 56px; height: 56px; border-radius: 50%;
-      background: var(--gradient-primary);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 1.1rem; color: #fff;
-      margin: 0 auto 1.25rem;
-      box-shadow: 0 0 30px rgba(99,102,241,0.3);
-    }
-    .step-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.375rem; }
-    .step-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6; }
-
-    /* ── CTA Section ────────────────────────────────── */
-    .cta-section {
-      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.08));
-      border: 1px solid rgba(99,102,241,0.15);
-      border-radius: var(--radius-xl);
-      padding: 5rem 3rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .cta-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at center, rgba(99,102,241,0.08) 0%, transparent 70%);
-    }
-    .cta-title { font-size: 3rem; font-weight: 900; margin-bottom: 1rem; position: relative; }
-    .cta-subtitle { font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 2rem; position: relative; }
-    .cta-btns { display: flex; gap: 1rem; justify-content: center; position: relative; }
-
-    /* ── Footer ─────────────────────────────────────── */
-    footer {
-      padding: 2.5rem 0;
-      border-top: 1px solid var(--border);
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.875rem;
+      display: flex; align-items: center;
+      padding: 7rem 0 5rem;
       position: relative; z-index: 1;
     }
-
-    @media (max-width: 1024px) {
-      .hero-grid { grid-template-columns: 1fr; text-align: center; }
-      .hero-visual { display: none; }
-      .hero-subtitle, .hero-cta, .hero-stats { justify-content: center; }
-      .features-grid { grid-template-columns: 1fr 1fr; }
-      .steps-grid { grid-template-columns: repeat(2, 1fr); }
-      .steps-grid::before { display: none; }
+    .hero-inner {
+      display: flex; align-items: center;
+      gap: 4rem;
     }
-    @media (max-width: 768px) {
-      .hero-title { font-size: 2.5rem; }
+    .hero-text { flex: 1; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: #f3f3f3; border: 1px solid #e5e5e0;
+      border-radius: 9999px; padding: 0.35rem 0.875rem;
+      font-size: 0.8125rem; font-weight: 600; color: #444;
+      margin-bottom: 1.75rem;
+    }
+    .hero-tag-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #111;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+    .hero-h1 {
+      font-size: clamp(2.5rem, 5.5vw, 4.25rem);
+      margin-bottom: 1.375rem;
+      overflow: visible;
+    }
+    /* Word-by-word animation */
+    .word-wrap { overflow: hidden; display: inline-block; }
+    .word-inner {
+      display: inline-block;
+      transform: translateY(110%);
+      animation: wordUp 0.65s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    @keyframes wordUp { to { transform: translateY(0); } }
+    .word-gap { display: inline-block; width: 0.35em; }
+
+    /* Underline accent */
+    .underline-accent { position: relative; display: inline-block; }
+    .underline-accent svg {
+      position: absolute; left: 0; bottom: -0.1em;
+      width: 100%; overflow: visible; pointer-events: none;
+    }
+    .underline-path {
+      stroke: #111; stroke-width: 3.5; stroke-linecap: round;
+      fill: none;
+      stroke-dasharray: 1; stroke-dashoffset: 1; pathLength: 1;
+      animation: drawLine 0.7s cubic-bezier(0.16,1,0.3,1) 1.1s forwards;
+    }
+    @keyframes drawLine { to { stroke-dashoffset: 0; } }
+
+    .hero-sub {
+      font-size: 1.0625rem; color: #555; font-weight: 500;
+      line-height: 1.65; max-width: 44ch;
+      margin-bottom: 2.25rem;
+      opacity: 0; animation: fadeUp 0.6s ease 0.8s forwards;
+    }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    .hero-btns {
+      display: flex; align-items: center; gap: 0.875rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.6s ease 1s forwards;
+    }
+    .hero-meta {
+      margin-top: 1.25rem;
+      font-size: 0.8125rem; color: #888;
+      display: flex; align-items: center; gap: 0.5rem;
+      opacity: 0; animation: fadeUp 0.5s ease 1.2s forwards;
+    }
+    .hero-meta-sep { width: 3px; height: 3px; border-radius: 50%; background: #ccc; }
+
+    /* Mesa-style buttons */
+    .btn-black {
+      position: relative;
+      display: inline-flex; align-items: center;
+      height: 54px; border-radius: 14px;
+      background: #111; color: white;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.9375rem;
+      padding-right: 1.375rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      transition: all 0.18s cubic-bezier(0.16,1,0.3,1);
+      white-space: nowrap;
+    }
+    .btn-black:hover { background: #222; transform: scale(0.97); }
+    .btn-black:active { transform: scale(0.94); }
+    .btn-black .btn-box {
+      margin: 5px; width: 44px; height: 44px;
+      background: rgba(255,255,255,0.14);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-right: 0.875rem; flex-shrink: 0;
+    }
+
+    .btn-white {
+      position: relative;
+      display: inline-flex; align-items: center;
+      height: 54px; border-radius: 14px;
+      background: white; color: #111;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.9375rem;
+      padding-right: 1.375rem;
+      border: 1.5px solid #e5e5e0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      transition: all 0.18s cubic-bezier(0.16,1,0.3,1);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .btn-white::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: #111;
+      transform: scaleY(0); transform-origin: bottom;
+      transition: transform 0.5s cubic-bezier(0.19,1,0.22,1);
+    }
+    .btn-white:hover::before { transform: scaleY(1); }
+    .btn-white:hover { color: white; border-color: #111; }
+    .btn-white:hover .btn-box-dark { background: white; }
+    .btn-white:hover .btn-box-dark svg { color: #111; }
+    .btn-white:active { transform: scale(0.97); }
+    .btn-white .btn-box-dark {
+      position: relative; z-index: 1;
+      margin: 5px; width: 44px; height: 44px;
+      background: #111; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-right: 0.875rem; flex-shrink: 0;
+      transition: background 0.4s;
+    }
+    .btn-white .btn-box-dark svg { color: white; transition: color 0.4s; }
+    .btn-white span { position: relative; z-index: 1; }
+
+    /* ── Hero Visual ── */
+    .hero-visual {
+      flex: 0 0 460px;
+      position: relative; height: 480px;
+      opacity: 0; animation: fadeUp 0.7s ease 0.6s forwards;
+    }
+
+    /* Floating mock cards */
+    .mock-card {
+      position: absolute;
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.09), 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    /* Main match card */
+    .mock-main {
+      width: 300px; top: 40px; left: 50%;
+      transform: translateX(-50%);
+      padding: 1.125rem;
+      animation: floatA 5s ease-in-out infinite;
+    }
+    @keyframes floatA {
+      0%,100%{transform:translateX(-50%) translateY(0)}
+      50%{transform:translateX(-50%) translateY(-10px)}
+    }
+    .mock-header { display: flex; align-items: center; gap: 0.625rem; margin-bottom: 0.875rem; }
+    .mock-av {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .mock-name  { font-size: 0.9375rem; font-weight: 700; font-family:'Space Grotesk',sans-serif; }
+    .mock-sub   { font-size: 0.75rem; color: #888; margin-top: 1px; }
+    .mock-score {
+      margin-left: auto; background: #111; color: white;
+      padding: 0.25rem 0.625rem; border-radius: 99px;
+      font-size: 0.8125rem; font-weight: 700; flex-shrink: 0;
+    }
+    .mock-tags { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 0.875rem; }
+    .mock-tag {
+      padding: 0.2rem 0.625rem; border-radius: 99px;
+      background: #f3f3f3; border: 1px solid #e5e5e0;
+      font-size: 0.75rem; font-weight: 600; color: #444;
+    }
+    .mock-bar-wrap { }
+    .mock-bar-label { display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-bottom:4px; }
+    .mock-bar-bg { height: 5px; background: #f0f0f0; border-radius: 99px; overflow: hidden; }
+    .mock-bar-fill { height: 100%; width: 92%; border-radius: 99px; background: #111; }
+
+    /* AI card */
+    .mock-ai {
+      width: 210px; bottom: 80px; right: 0;
+      padding: 1rem;
+      animation: floatB 5.5s ease-in-out 1.5s infinite;
+    }
+    @keyframes floatB { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .mock-ai-label { font-size: 0.6875rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+    .mock-ai-text  { font-size: 0.8125rem; color: #444; line-height: 1.5; font-weight: 500; }
+
+    /* Connection card */
+    .mock-conn {
+      width: 175px; top: 90px; left: 0;
+      padding: 0.875rem;
+      animation: floatC 6s ease-in-out 0.7s infinite;
+    }
+    @keyframes floatC { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+    .mock-conn-label { font-size: 0.6875rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.625rem; }
+    .mock-conn-row   { display: flex; align-items: center; gap: 0.5rem; }
+    .mock-conn-av    { width: 28px; height: 28px; border-radius: 50%; background: #111; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; font-weight: 700; flex-shrink: 0; }
+    .mock-conn-name  { font-size: 0.8125rem; font-weight: 700; }
+    .mock-conn-status { display: flex; align-items: center; gap: 0.25rem; font-size: 0.6875rem; color: #888; font-weight: 500; margin-top: 2px; }
+    .mock-dot-green  { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+
+    /* ══════════════════════════════
+       UNIVERSITY STRIP
+    ══════════════════════════════ */
+    .uni-strip {
+      position: relative; z-index: 1;
+      border-top: 1px solid #e5e5e0;
+      border-bottom: 1px solid #e5e5e0;
+      padding: 1.75rem 0;
+      background: white;
+    }
+    .uni-strip-inner {
+      display: flex; align-items: center; gap: 3rem;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .uni-label { font-size: 0.8125rem; font-weight: 600; color: #aaa; letter-spacing: 0.04em; }
+    .uni-names { display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap; }
+    .uni-name  { font-size: 0.875rem; font-weight: 700; color: #ccc; font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.01em; }
+
+    /* ══════════════════════════════
+       FEATURES
+    ══════════════════════════════ */
+    .features { padding: 6rem 0; position: relative; z-index: 1; }
+    .section-eyebrow {
+      font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #888; margin-bottom: 0.75rem;
+    }
+    .features-grid {
+      margin-top: 3.5rem;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
+    }
+    .feat-card {
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 20px; padding: 1.625rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .feat-card:hover {
+      border-color: #111;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      transform: translateY(-4px);
+    }
+    .feat-icon-box {
+      width: 44px; height: 44px;
+      background: #111; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.125rem;
+      transition: transform 0.3s;
+    }
+    .feat-card:hover .feat-icon-box { transform: scale(1.08); }
+    .feat-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.0625rem; font-weight: 700;
+      margin-bottom: 0.5rem; letter-spacing: -0.02em;
+    }
+    .feat-card p { font-size: 0.9rem; color: #666; line-height: 1.65; }
+
+    /* ══════════════════════════════
+       HOW IT WORKS — SCROLL DRIVEN
+    ══════════════════════════════ */
+    .hiw {
+      padding: 6rem 0;
+      position: relative; z-index: 1;
+      background: white;
+      border-top: 1px solid #e5e5e0;
+    }
+    .hiw-header { text-align: center; margin-bottom: 5rem; }
+    .hiw-title-wrap { display: inline-block; position: relative; }
+    .hiw-title-wrap svg {
+      position: absolute; left: 0; bottom: -0.18em;
+      width: 100%; overflow: visible;
+    }
+
+    /* Vertical connecting line */
+    .hiw-steps { position: relative; display: flex; flex-direction: column; gap: 5rem; }
+
+    /* S-curve connector SVG */
+    .hiw-connector {
+      position: absolute;
+      top: 80px; bottom: 80px; left: 0; right: 0;
+      pointer-events: none; z-index: 0;
+      overflow: visible; width: 100%; height: calc(100% - 160px);
+    }
+    @keyframes drawPath {
+      from { stroke-dashoffset: 2000; }
+      to   { stroke-dashoffset: 0; }
+    }
+    .hiw-connect-path {
+      fill: none;
+      stroke: #111;
+      stroke-width: 4px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+    }
+    .hiw-connector.drawn .hiw-connect-path {
+      animation: drawPath 2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    }
+    @media (max-width: 900px) {
+      .hiw-connector { display: none; }
+    }
+
+    /* Each step */
+    .hiw-step {
+      display: flex; align-items: center; gap: 4rem;
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .hiw-step.visible { opacity: 1; transform: translateY(0); }
+    .hiw-step.reverse { flex-direction: row-reverse; }
+
+    /* Visual side */
+    .hiw-visual {
+      flex: 0 0 460px; height: 320px;
+      border-radius: 24px; position: relative;
+      overflow: hidden;
+      border: 1px solid #e5e5e0;
+      background: #fafafa;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+    /* Step number badge */
+    .hiw-num {
+      position: absolute; top: -14px; left: -14px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      z-index: 10;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+    }
+
+    /* Text side */
+    .hiw-text { flex: 1; }
+    .hiw-step-label {
+      font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #aaa; margin-bottom: 0.75rem;
+    }
+    .hiw-step h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 700; letter-spacing: -0.025em;
+      margin-bottom: 0.875rem;
+    }
+    .hiw-step p { font-size: 1rem; color: #666; line-height: 1.7; max-width: 40ch; }
+    .hiw-step-cta {
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      margin-top: 1.5rem;
+      font-size: 0.9rem; font-weight: 700;
+      color: #111; border-bottom: 1.5px solid #111;
+      padding-bottom: 1px;
+      transition: gap 0.2s;
+    }
+    .hiw-step-cta:hover { gap: 0.625rem; }
+
+    /* ── Step 1 visual: Profile builder mockup ── */
+    .v1-inner {
+      padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.875rem;
+      height: 100%;
+    }
+    .v1-top {
+      display: flex; align-items: center; gap: 0.875rem;
+    }
+    .v1-av {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.125rem;
+    }
+    .v1-name { font-family: 'Space Grotesk',sans-serif; font-size: 1.125rem; font-weight: 700; }
+    .v1-role { font-size: 0.8125rem; color: #888; margin-top: 2px; }
+    .v1-progress {
+      display: flex; gap: 0.375rem; margin-top: 0.25rem;
+    }
+    .v1-dot {
+      height: 5px; border-radius: 99px; flex: 1;
+      background: #e5e5e0;
+    }
+    .v1-dot.done { background: #111; }
+    .v1-skills-title { font-size: 0.75rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+    .v1-skills { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+    .v1-skill {
+      padding: 0.3rem 0.75rem; border-radius: 99px;
+      background: white; border: 1px solid #e5e5e0;
+      font-size: 0.8125rem; font-weight: 600; color: #333;
+    }
+    .v1-goal-row { display: flex; gap: 0.625rem; }
+    .v1-goal-card {
+      flex: 1; background: white; border: 1px solid #e5e5e0;
+      border-radius: 12px; padding: 0.625rem;
+    }
+    .v1-goal-label { font-size: 0.6875rem; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+    .v1-goal-val   { font-size: 0.8125rem; font-weight: 600; }
+
+    /* ── Step 2 visual: Match score ── */
+    .v2-inner {
+      padding: 1.5rem; height: 100%;
+      display: flex; flex-direction: column; gap: 0.875rem;
+    }
+    .v2-label { font-size: 0.75rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+    .v2-match-row {
+      display: flex; align-items: center; gap: 1rem;
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 14px; padding: 0.875rem; flex: 0;
+    }
+    .v2-match-av {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+    }
+    .v2-match-name { font-size: 0.9375rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+    .v2-match-sub  { font-size: 0.75rem; color: #888; }
+    .v2-match-score {
+      margin-left: auto; background: #111; color: white;
+      padding: 0.3rem 0.7rem; border-radius: 99px;
+      font-size: 0.9rem; font-weight: 800; flex-shrink: 0;
+    }
+    .v2-bars { display: flex; flex-direction: column; gap: 0.625rem; flex: 1; }
+    .v2-bar-row { }
+    .v2-bar-top { display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; margin-bottom: 4px; font-weight: 500; }
+    .v2-bar-bg  { height: 6px; background: #f0f0f0; border-radius: 99px; overflow: hidden; }
+    .v2-bar-fill { height: 100%; border-radius: 99px; background: #111; }
+
+    /* ── Step 3 visual: Chat mockup ── */
+    .v3-inner {
+      padding: 1.5rem; height: 100%;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .v3-header {
+      display: flex; align-items: center; gap: 0.625rem;
+      padding-bottom: 0.875rem; border-bottom: 1px solid #e5e5e0;
+    }
+    .v3-av {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6875rem; font-weight: 700;
+    }
+    .v3-hname { font-size: 0.9rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+    .v3-hstatus { display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; color: #888; }
+    .v3-online { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+    .v3-msgs { display: flex; flex-direction: column; gap: 0.625rem; flex: 1; padding: 0.875rem 0; }
+    .v3-msg-them {
+      align-self: flex-start; max-width: 78%;
+      background: #f3f3f3; border-radius: 0 14px 14px 14px;
+      padding: 0.6rem 0.875rem; font-size: 0.875rem; line-height: 1.4; color: #333;
+    }
+    .v3-msg-me {
+      align-self: flex-end; max-width: 78%;
+      background: #111; color: white; border-radius: 14px 14px 0 14px;
+      padding: 0.6rem 0.875rem; font-size: 0.875rem; line-height: 1.4;
+    }
+    .v3-input {
+      display: flex; align-items: center; gap: 0.625rem;
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 12px; padding: 0.625rem 0.875rem;
+    }
+    .v3-input-text { flex: 1; font-size: 0.875rem; color: #aaa; font-style: italic; }
+    .v3-send {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════
+       CTA
+    ══════════════════════════════ */
+    .cta-section {
+      position: relative; z-index: 1;
+      padding: 5rem 0;
+    }
+    .cta-inner {
+      background: #111; border-radius: 28px;
+      padding: 4.5rem; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-blob {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      background: rgba(255,255,255,0.04);
+    }
+    .cta-blob-1 { width: 360px; height: 360px; top: -120px; right: -80px; }
+    .cta-blob-2 { width: 240px; height: 240px; bottom: -80px; left: -60px; }
+    .cta-inner h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700; color: white;
+      letter-spacing: -0.03em; margin-bottom: 1rem;
+      position: relative; z-index: 1;
+    }
+    .cta-inner p {
+      color: rgba(255,255,255,0.65); font-size: 1rem;
+      max-width: 40ch; margin: 0 auto 2.25rem;
+      position: relative; z-index: 1;
+    }
+    .cta-btns {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.875rem; flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .btn-white-inv {
+      display: inline-flex; align-items: center;
+      height: 54px; border-radius: 14px;
+      background: white; color: #111;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.9375rem;
+      padding-right: 1.375rem;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+      transition: all 0.18s;
+    }
+    .btn-white-inv:hover { opacity: 0.92; transform: scale(0.97); }
+    .btn-white-inv .btn-box {
+      margin: 5px; width: 44px; height: 44px;
+      background: #111; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-right: 0.875rem;
+    }
+    .btn-ghost-inv {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      height: 54px; border-radius: 14px;
+      background: transparent; color: rgba(255,255,255,0.75);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.9375rem;
+      padding: 0 1.375rem;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      transition: all 0.18s;
+    }
+    .btn-ghost-inv:hover { color: white; border-color: rgba(255,255,255,0.45); }
+
+    /* ══════════════════════════════
+       FOOTER
+    ══════════════════════════════ */
+    .footer {
+      border-top: 1px solid #e5e5e0;
+      padding: 2rem 0;
+      position: relative; z-index: 1;
+      background: white;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { font-size: 0.875rem; color: #888; font-weight: 500; transition: color 0.15s; }
+    .footer-links a:hover { color: #111; }
+    .footer-copy { font-size: 0.875rem; color: #bbb; }
+
+    /* ══════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════ */
+    @media (max-width: 1024px) {
+      .hero-visual { flex: 0 0 380px; }
+      .hiw-visual  { flex: 0 0 380px; }
+    }
+    @media (max-width: 900px) {
+      .hero-inner  { flex-direction: column; text-align: center; }
+      .hero-sub, .hero-btns, .hero-meta { margin-left: auto; margin-right: auto; justify-content: center; }
+      .hero-visual { flex: none; width: 100%; max-width: 420px; height: 380px; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .hiw-step { flex-direction: column !important; gap: 2rem; }
+      .hiw-step p { max-width: none; }
+      .hiw-visual { flex: none; width: 100%; height: 280px; }
+      .hiw-steps::before { display: none; }
+      .cta-inner { padding: 3rem 1.5rem; }
+    }
+    @media (max-width: 600px) {
+      .nav-pill   { display: none; }
       .features-grid { grid-template-columns: 1fr; }
+      .hero-h1    { font-size: 2.25rem; }
+      .hero-visual { height: 300px; }
+    }
+    @media (max-width: 480px) {
+      .hero-btns  { flex-direction: column; align-items: stretch; }
+      .btn-black, .btn-white { width: 100%; }
     }
   </style>
 </head>
 <body>
-  <div class="mesh-bg"></div>
 
-  <!-- Navbar -->
-  <nav class="navbar">
-    <a href="index.html" class="navbar-brand">
-      <div class="logo-icon">⚡</div>
+  <!-- Dot grid -->
+  <div class="dot-grid" aria-hidden="true"></div>
+
+  <!-- ── Navbar ── -->
+  <nav class="nav-outer" aria-label="Main navigation">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">⚡</div>
       StackMate
     </a>
-    <div class="navbar-links">
-      <a href="#features">Features</a>
-      <a href="#how-it-works">How it works</a>
+
+    <div class="nav-pill">
+      <a href="#" class="nav-item active">Home</a>
+      <a href="#features" class="nav-item">Features</a>
+      <a href="#how-it-works" class="nav-item">How it works</a>
     </div>
-    <div class="navbar-actions">
-      <a href="auth.html" class="btn btn-outline" id="nav-login">Log In</a>
-      <a href="auth.html?mode=register" class="btn btn-primary" id="nav-signup">Get Started</a>
-    </div>
+
+    <a href="auth.html" class="nav-cta">
+      Get started
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
   </nav>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-grid">
-        <div class="hero-content anim-fade-up">
-          <div class="hero-eyebrow">
-            <span></span>
-            Built for college students
+  <!-- ── Hero ── -->
+  <section class="hero" id="home">
+    <div class="wrap">
+      <div class="hero-inner">
+
+        <!-- Text -->
+        <div class="hero-text">
+          <div class="hero-tag">
+            <span class="hero-tag-dot"></span>
+            Built for college developers
           </div>
-          <h1 class="hero-title">
-            Find your perfect<br/>
-            <span class="gradient-text">coding partner</span>
+
+          <h1 class="h-display hero-h1">
+            <span class="word-wrap"><span class="word-inner" style="animation-delay:0.1s">Find</span></span><span class="word-gap"></span>
+            <span class="word-wrap"><span class="word-inner" style="animation-delay:0.18s">your</span></span><span class="word-gap"></span>
+            <span class="word-wrap"><span class="word-inner" style="animation-delay:0.26s">perfect</span></span><br/>
+            <span class="underline-accent">
+              <span class="word-wrap"><span class="word-inner" style="animation-delay:0.34s">coding</span></span>
+              <svg width="100%" height="12" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path class="underline-path" d="M4 8.5C40 4.5 130 4 196 8.5"/>
+              </svg>
+            </span><span class="word-gap"></span>
+            <span class="word-wrap"><span class="word-inner" style="animation-delay:0.42s">partner.</span></span>
           </h1>
-          <p class="hero-subtitle">
-            StackMate matches you with the ideal coding partner based on your skills, learning goals, and work style — so you can build something great together.
+
+          <p class="hero-sub">
+            Match with students who complement your skills. Build hackathon teams, side projects, and lasting collaborations — not just connections.
           </p>
-          <div class="hero-cta">
-            <a href="auth.html?mode=register" class="btn btn-primary btn-lg" id="hero-cta-signup">
-              🚀 Start Matching Free
+
+          <div class="hero-btns">
+            <a href="auth.html?mode=register" class="btn-black">
+              <div class="btn-box">
+                <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              Get matched free
             </a>
-            <a href="#how-it-works" class="btn btn-outline btn-lg">
-              See How It Works
+            <a href="#how-it-works" class="btn-white">
+              <div class="btn-box-dark">
+                <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+              </div>
+              <span>See how it works</span>
             </a>
           </div>
-          <div class="hero-stats">
-            <div class="hero-stat">
-              <div class="hero-stat-num gradient-text">5-Factor</div>
-              <div class="hero-stat-label">Match Algorithm</div>
-            </div>
-            <div class="hero-stat">
-              <div class="hero-stat-num gradient-text">100%</div>
-              <div class="hero-stat-label">Student Focused</div>
-            </div>
-            <div class="hero-stat">
-              <div class="hero-stat-num gradient-text">Free</div>
-              <div class="hero-stat-label">Always</div>
-            </div>
+
+          <div class="hero-meta">
+            Free forever <span class="hero-meta-sep"></span> No credit card <span class="hero-meta-sep"></span> 2 min signup
           </div>
         </div>
-        <div class="hero-visual anim-fade-up anim-delay-2">
-          <div class="hero-card-stack">
-            <div class="glow-orb orb1"></div>
-            <div class="glow-orb orb2"></div>
-            <div class="pulse-ring"></div>
-            <div class="pulse-ring"></div>
-            <!-- Left card -->
-            <div class="floating-card card-left">
-              <div class="fc-name">Arjun Mehta</div>
-              <div class="fc-meta">2nd Year • Computer Science</div>
-              <div class="fc-skills">
-                <span class="skill-tag">React</span>
-                <span class="skill-tag">Node.js</span>
+
+        <!-- Visual -->
+        <div class="hero-visual" aria-hidden="true">
+          <!-- Main match card -->
+          <div class="mock-card mock-main">
+            <div class="mock-header">
+              <div class="mock-av">AR</div>
+              <div>
+                <div class="mock-name">Aryan Mehta</div>
+                <div class="mock-sub">CS · Year 2 · Backend</div>
               </div>
+              <div class="mock-score">92%</div>
             </div>
-            <!-- Main card -->
-            <div class="floating-card main-match-card">
-              <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
-                <div class="avatar">P</div>
-                <div>
-                  <div class="fc-name">Priya Sharma</div>
-                  <div class="fc-meta">3rd Year • B.Tech CSE • IIT Delhi</div>
-                </div>
-                <div class="match-percent" style="margin-left:auto;">92%</div>
-              </div>
-              <div style="font-size:0.8125rem;color:var(--text-secondary);margin-bottom:0.75rem;">
-                🎯 Looking for hackathon partner
-              </div>
-              <div class="fc-skills">
-                <span class="skill-tag">Python</span>
-                <span class="skill-tag">ML</span>
-                <span class="skill-tag">FastAPI</span>
-                <span class="skill-tag">React</span>
-              </div>
-              <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:0.75rem;color:var(--text-muted);">⏱ 10–15 hrs/week</span>
-                <button class="btn btn-primary btn-sm">Connect</button>
-              </div>
+            <div class="mock-tags">
+              <span class="mock-tag">React</span>
+              <span class="mock-tag">Node.js</span>
+              <span class="mock-tag">MongoDB</span>
+              <span class="mock-tag">Python</span>
             </div>
-            <!-- Right card -->
-            <div class="floating-card card-right">
-              <div class="fc-name">Sam Verma</div>
-              <div class="fc-meta">3rd Year • Information Technology</div>
-              <div class="fc-skills">
-                <span class="skill-tag">Flutter</span>
-                <span class="skill-tag">Firebase</span>
+            <div class="mock-bar-wrap">
+              <div class="mock-bar-label"><span>Match score</span><span>92/100</span></div>
+              <div class="mock-bar-bg"><div class="mock-bar-fill"></div></div>
+            </div>
+          </div>
+
+          <!-- AI explanation card -->
+          <div class="mock-card mock-ai">
+            <div class="mock-ai-label">✦ AI Insight</div>
+            <div class="mock-ai-text">"Your ML skills perfectly fill their frontend gap — ideal for a full-stack team."</div>
+          </div>
+
+          <!-- Connection card -->
+          <div class="mock-card mock-conn">
+            <div class="mock-conn-label">✓ Connected</div>
+            <div class="mock-conn-row">
+              <div class="mock-conn-av">PR</div>
+              <div>
+                <div class="mock-conn-name">Priya S.</div>
+                <div class="mock-conn-status"><span class="mock-dot-green"></span> In workspace</div>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- Features -->
-  <section class="section" id="features">
-    <div class="container">
-      <div style="text-align:center;margin-bottom:3rem;">
-        <h2 class="section-title">Why <span class="gradient-text">StackMate</span> is different</h2>
-        <p class="section-subtitle" style="margin:0 auto;">Not just another partner finder. We match on what actually matters — skills, goals, and how you work.</p>
+  <!-- ── University strip ── -->
+  <div class="uni-strip">
+    <div class="wrap uni-strip-inner">
+      <span class="uni-label">Trusted by students from</span>
+      <div class="uni-names">
+        <span class="uni-name">IIT Mumbai</span>
+        <span class="uni-name">Delhi University</span>
+        <span class="uni-name">VIT Vellore</span>
+        <span class="uni-name">BITS Pilani</span>
+        <span class="uni-name">NIT Trichy</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ── Features ── -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div>
+        <p class="section-eyebrow">Features</p>
+        <h2 class="h-section" style="font-size:clamp(1.75rem,3vw,2.5rem);max-width:18ch;">Everything you need to find the right partner</h2>
+      </div>
+
       <div class="features-grid">
-        <div class="feature-card anim-fade-up anim-delay-1">
-          <div class="feature-icon">🎓</div>
-          <h3 class="feature-title">Student-First Structure</h3>
-          <p class="feature-desc">Built specifically for college students. Your year, program, and university are core to how we match you — not an afterthought.</p>
+        <div class="feat-card">
+          <div class="feat-icon-box">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          </div>
+          <h3>Smart Matching</h3>
+          <p>100-point algorithm matches you on complementary skills, shared goals, work style, and interests.</p>
         </div>
-        <div class="feature-card anim-fade-up anim-delay-2">
-          <div class="feature-icon">🧠</div>
-          <h3 class="feature-title">Smart 5-Factor Matching</h3>
-          <p class="feature-desc">We analyze complementary skills, aligned goals, project interests, work style, and year proximity to find your ideal partner.</p>
+        <div class="feat-card">
+          <div class="feat-icon-box">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3>Real-time Chat</h3>
+          <p>Instant messaging with typing indicators. Talk to matches before committing to a connection.</p>
         </div>
-        <div class="feature-card anim-fade-up anim-delay-3">
-          <div class="feature-icon">⚡</div>
-          <h3 class="feature-title">Complementary, not identical</h3>
-          <p class="feature-desc">What you're learning should match what they know, and vice versa. Great teams are built on complementary skills, not duplicates.</p>
+        <div class="feat-card">
+          <div class="feat-icon-box">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h3>AI Explanation</h3>
+          <p>Not sure why you matched? Our AI explains exactly how your profiles complement each other.</p>
         </div>
-        <div class="feature-card anim-fade-up anim-delay-1">
-          <div class="feature-icon">🎯</div>
-          <h3 class="feature-title">Goal Alignment</h3>
-          <p class="feature-desc">Both looking for a hackathon team? Or an open source contributor? Goals alignment is the #1 predictor of successful partnerships.</p>
+        <div class="feat-card">
+          <div class="feat-icon-box">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+          </div>
+          <h3>Virtual Workspace</h3>
+          <p>A shared pixel room where you and your partner can work together and stay in sync.</p>
         </div>
-        <div class="feature-card anim-fade-up anim-delay-2">
-          <div class="feature-icon">🕐</div>
-          <h3 class="feature-title">Work Style Match</h3>
-          <p class="feature-desc">Sync or async? 5 hrs/week or 20? We factor in your schedule and collaboration style so expectations are always aligned.</p>
+        <div class="feat-card">
+          <div class="feat-icon-box">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>3-Connection Limit</h3>
+          <p>Capped at 3 partners intentionally. Quality over quantity — build deep work, not a network.</p>
         </div>
-        <div class="feature-card anim-fade-up anim-delay-3">
-          <div class="feature-icon">📊</div>
-          <h3 class="feature-title">Transparent Match Score</h3>
-          <p class="feature-desc">See exactly why you matched. We break down your score by category — so you always know what you're getting into.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- How it works -->
-  <section class="section" id="how-it-works" style="background:linear-gradient(180deg, transparent, rgba(99,102,241,0.03) 50%, transparent);">
-    <div class="container">
-      <div style="text-align:center;margin-bottom:3rem;">
-        <h2 class="section-title">How it <span class="gradient-text">works</span></h2>
-        <p class="section-subtitle" style="margin:0 auto;">Four simple steps to find the partner who'll make your project shine.</p>
-      </div>
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-num">1</div>
-          <h3 class="step-title">Create Account</h3>
-          <p class="step-desc">Sign up in seconds with your name and email. No social login required.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">2</div>
-          <h3 class="step-title">Build Your Profile</h3>
-          <p class="step-desc">Tell us your year, program, skills, what you're learning, and your goals through our guided onboarding.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">3</div>
-          <h3 class="step-title">See Your Matches</h3>
-          <p class="step-desc">Get ranked partner suggestions with a match score and breakdown of why you clicked.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">4</div>
-          <h3 class="step-title">Connect & Build</h3>
-          <p class="step-desc">Send a connection request and start collaborating — on hackathons, projects, research, and more.</p>
+        <div class="feat-card">
+          <div class="feat-icon-box">
+            <svg width="20" height="20" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <h3>Always Free</h3>
+          <p>No premium tier, no credits, no pay wall. Built for students, kept free for students forever.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="section">
-    <div class="container">
-      <div class="cta-section">
-        <h2 class="cta-title">Ready to find your <span class="gradient-text">stack partner?</span></h2>
-        <p class="cta-subtitle">Join students who are building together, smarter.</p>
+  <!-- ── How It Works ── -->
+  <section class="hiw" id="how-it-works">
+    <div class="wrap">
+      <div class="hiw-header">
+        <p class="section-eyebrow">How it works</p>
+        <h2 class="h-section hiw-title-wrap" style="font-size:clamp(2rem,3.5vw,2.75rem);">
+          From signup to collaboration
+          <svg width="100%" height="12" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="bottom:-0.25em;">
+            <path d="M4 8.5C40 4.5 130 4 196 8.5" stroke="#111" stroke-width="3" stroke-linecap="round" pathLength="1" stroke-dasharray="0 1" class="hiw-underline-path"/>
+          </svg>
+        </h2>
+        <p style="color:#666;margin-top:1.25rem;font-size:1rem;max-width:44ch;margin-left:auto;margin-right:auto;">Three steps from your first login to your first commit together.</p>
+      </div>
+
+      <div class="hiw-steps" id="hiw-steps">
+
+        <!-- S-curve connecting path: left (step1) → right (step2) → left (step3) -->
+        <svg class="hiw-connector" id="hiw-connector" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path class="hiw-connect-path"
+            d="M 28,0 C 28,18 72,32 72,50 C 72,68 28,82 28,100"/>
+        </svg>
+        <!-- Step 1 -->
+        <div class="hiw-step" data-step>
+          <div class="hiw-visual" style="position:relative;">
+            <div class="hiw-num">1</div>
+            <div class="v1-inner">
+              <div class="v1-top">
+                <div class="v1-av">KJ</div>
+                <div>
+                  <div class="v1-name">Krish Jain</div>
+                  <div class="v1-role">CS · Year 3</div>
+                </div>
+              </div>
+              <div>
+                <div class="v1-progress">
+                  <div class="v1-dot done"></div>
+                  <div class="v1-dot done"></div>
+                  <div class="v1-dot done"></div>
+                  <div class="v1-dot done"></div>
+                  <div class="v1-dot"></div>
+                </div>
+                <div style="font-size:0.75rem;color:#aaa;margin-top:4px;font-weight:500;">Step 4 of 5 — Almost done!</div>
+              </div>
+              <div>
+                <div class="v1-skills-title">My skills</div>
+                <div class="v1-skills" style="margin-top:0.5rem;">
+                  <span class="v1-skill">Python</span>
+                  <span class="v1-skill">ML / AI</span>
+                  <span class="v1-skill">Flask</span>
+                  <span class="v1-skill">SQL</span>
+                </div>
+              </div>
+              <div class="v1-goal-row">
+                <div class="v1-goal-card">
+                  <div class="v1-goal-label">Short goal</div>
+                  <div class="v1-goal-val">Win a hackathon</div>
+                </div>
+                <div class="v1-goal-card">
+                  <div class="v1-goal-label">Hours/week</div>
+                  <div class="v1-goal-val">15 hrs</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hiw-text">
+            <div class="hiw-step-label">Step 01</div>
+            <h3>Build your profile</h3>
+            <p>Add your skills, what you're learning, short and long-term goals, work style, and how many hours per week you can commit. Takes 5 minutes.</p>
+            <a href="auth.html?mode=register" class="hiw-step-cta">
+              Create your profile
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Step 2 (reversed) -->
+        <div class="hiw-step reverse" data-step>
+          <div class="hiw-visual" style="position:relative;">
+            <div class="hiw-num">2</div>
+            <div class="v2-inner">
+              <div class="v2-label">Top match for you</div>
+              <div class="v2-match-row">
+                <div class="v2-match-av">PR</div>
+                <div>
+                  <div class="v2-match-name">Priya Sharma</div>
+                  <div class="v2-match-sub">Frontend · React · Year 2</div>
+                </div>
+                <div class="v2-match-score">92</div>
+              </div>
+              <div class="v2-bars">
+                <div class="v2-bar-row">
+                  <div class="v2-bar-top"><span>Skill complement</span><span>28/30</span></div>
+                  <div class="v2-bar-bg"><div class="v2-bar-fill" style="width:93%"></div></div>
+                </div>
+                <div class="v2-bar-row">
+                  <div class="v2-bar-top"><span>Goal alignment</span><span>22/25</span></div>
+                  <div class="v2-bar-bg"><div class="v2-bar-fill" style="width:88%"></div></div>
+                </div>
+                <div class="v2-bar-row">
+                  <div class="v2-bar-top"><span>Work style</span><span>14/15</span></div>
+                  <div class="v2-bar-bg"><div class="v2-bar-fill" style="width:93%"></div></div>
+                </div>
+                <div class="v2-bar-row">
+                  <div class="v2-bar-top"><span>Project interests</span><span>18/20</span></div>
+                  <div class="v2-bar-bg"><div class="v2-bar-fill" style="width:90%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hiw-text">
+            <div class="hiw-step-label">Step 02</div>
+            <h3>Get matched & understand why</h3>
+            <p>See your top matches ranked by a 100-point score. Read a detailed breakdown and let our AI explain exactly how your profiles complement each other.</p>
+            <a href="auth.html?mode=register" class="hiw-step-cta">
+              See your matches
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="hiw-step" data-step>
+          <div class="hiw-visual" style="position:relative;">
+            <div class="hiw-num">3</div>
+            <div class="v3-inner">
+              <div class="v3-header">
+                <div class="v3-av">PR</div>
+                <div>
+                  <div class="v3-hname">Priya Sharma</div>
+                  <div class="v3-hstatus"><span class="v3-online"></span> Online now</div>
+                </div>
+              </div>
+              <div class="v3-msgs">
+                <div class="v3-msg-them">Hey! Saw we matched 92% — want to team up for the DevJam hackathon? 🚀</div>
+                <div class="v3-msg-me">Yes! Your React skills are exactly what my ML backend needs.</div>
+                <div class="v3-msg-them">Perfect. I've already set up our virtual workspace 💻</div>
+              </div>
+              <div class="v3-input">
+                <span class="v3-input-text">Type a message…</span>
+                <div class="v3-send">
+                  <svg width="14" height="14" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hiw-text">
+            <div class="hiw-step-label">Step 03</div>
+            <h3>Connect and start building</h3>
+            <p>Send a request, chat instantly, and enter your shared virtual workspace. Your character moves, shows your status, and links to your GitHub — all in real time.</p>
+            <a href="auth.html?mode=register" class="hiw-step-cta">
+              Start for free
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <div class="wrap">
+      <div class="cta-inner" data-step>
+        <div class="cta-blob cta-blob-1"></div>
+        <div class="cta-blob cta-blob-2"></div>
+        <h2>Ready to find your match?</h2>
+        <p>Join developers who are building better projects with the right partners by their side.</p>
         <div class="cta-btns">
-          <a href="auth.html?mode=register" class="btn btn-primary btn-lg" id="cta-signup">
-            🚀 Get Started — It's Free
+          <a href="auth.html?mode=register" class="btn-white-inv">
+            <div class="btn-box">
+              <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            Get matched — it's free
           </a>
+          <a href="auth.html?mode=login" class="btn-ghost-inv">Sign in</a>
         </div>
       </div>
     </div>
   </section>
 
-  <footer>
-    <div class="container">
-      <p>⚡ StackMate v2 — Built for builders &nbsp;|&nbsp; Hackathon Edition 2024</p>
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <a href="index.html" class="nav-logo" style="box-shadow:none;border:1px solid #e5e5e0;padding:0.4rem 0.75rem;">
+        <div class="nav-logo-icon" style="width:26px;height:26px;font-size:0.75rem;">⚡</div>
+        StackMate
+      </a>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="auth.html">Sign up</a>
+      </div>
+      <p class="footer-copy">© 2025 StackMate. Built for students.</p>
     </div>
   </footer>
 
   <script>
-    // Redirect logged-in users to dashboard
-    const token = localStorage.getItem('sm_token');
-    if (token) {
-      document.getElementById('nav-login').href = 'dashboard.html';
-      document.getElementById('nav-login').textContent = 'Dashboard';
-      document.getElementById('nav-signup').style.display = 'none';
-      document.getElementById('hero-cta-signup').href = 'dashboard.html';
-      document.getElementById('hero-cta-signup').textContent = '🚀 Go to Dashboard';
-      if (document.getElementById('cta-signup')) {
-        document.getElementById('cta-signup').href = 'dashboard.html';
-        document.getElementById('cta-signup').textContent = '🚀 Go to Dashboard';
-      }
+    // ── Draw S-curve when How It Works section enters view ──
+    const connector = document.getElementById('hiw-connector');
+    if (connector) {
+      const hiwSection = document.getElementById('how-it-works');
+      const connObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            connector.classList.add('drawn');
+            connObs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      connObs.observe(hiwSection);
     }
 
-    // Animate on scroll
-    const observer = new IntersectionObserver((entries) => {
+    // ── Scroll-driven How It Works ──
+    const steps = document.querySelectorAll('[data-step]');
+    const io = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
-          e.target.style.animationPlayState = 'running';
-          observer.unobserve(e.target);
+          e.target.classList.add('visible');
+          io.unobserve(e.target); // animate once
         }
       });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.anim-fade-up').forEach(el => {
-      el.style.animationPlayState = 'paused';
-      observer.observe(el);
+    }, { threshold: 0.18 });
+
+    steps.forEach((s, i) => {
+      s.style.transitionDelay = `${i * 0.05}s`;
+      io.observe(s);
     });
+
+    // ── How it works underline draw on scroll ──
+    const hiwPath = document.querySelector('.hiw-underline-path');
+    if (hiwPath) {
+      const hdr = document.querySelector('.hiw-header');
+      const hdrObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            hiwPath.style.animation = 'drawLine 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s forwards';
+            hdrObs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.5 });
+      hdrObs.observe(hdr);
+    }
+
+    // ── Smooth active nav on scroll ──
+    const sections = [
+      { id: 'home',         el: document.getElementById('home') },
+      { id: 'features',     el: document.getElementById('features') },
+      { id: 'how-it-works', el: document.getElementById('how-it-works') }
+    ];
+    const navItems = document.querySelectorAll('.nav-item');
+    window.addEventListener('scroll', () => {
+      let current = 'home';
+      sections.forEach(s => {
+        if (s.el && window.scrollY >= s.el.offsetTop - 120) current = s.id;
+      });
+      navItems.forEach(n => {
+        const href = n.getAttribute('href').replace('#','') || 'home';
+        n.classList.toggle('active', href === current || (href === '' && current === 'home'));
+      });
+    }, { passive: true });
   </script>
 </body>
 </html>
