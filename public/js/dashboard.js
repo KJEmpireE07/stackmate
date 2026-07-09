@@ -280,8 +280,13 @@ function setFilter(filter, btn) {
 function renderMatches() {
   const grid = document.getElementById('matches-grid');
   let filtered = allMatches;
-  if (activeFilter !== 'all') {
-    filtered = allMatches.filter(m => m.user.shortTermGoal === activeFilter);
+  
+  if (activeFilter === 'year') {
+    filtered = allMatches.filter(m => m.breakdown.year > 0);
+  } else if (activeFilter === 'goals') {
+    filtered = allMatches.filter(m => m.breakdown.goals > 0);
+  } else if (activeFilter === 'skills') {
+    filtered = allMatches.filter(m => m.breakdown.skills > 0);
   }
 
   if (!filtered.length) {
@@ -294,7 +299,7 @@ function renderMatches() {
           isAtLimit
             ? 'You have 3 connections. Remove one to discover new partners.'
             : activeFilter !== 'all'
-              ? 'No one with that goal yet — try a different filter or check back later.'
+              ? 'No one strictly matches that criteria yet — try a different filter or check back later.'
               : 'No other students found yet. Invite a friend to join StackMate!'
         }</p>
       </div>`;
@@ -307,11 +312,13 @@ function renderMatches() {
   setTimeout(() => {
     document.querySelectorAll('[data-score]').forEach(el => {
       const score = parseInt(el.dataset.score);
+      const maxScore = parseInt(el.dataset.max) || 100;
       const circumference = 2 * Math.PI * 36;
-      const offset = circumference - (score / 100) * circumference;
+      const offset = circumference - (score / maxScore) * circumference;
       el.style.strokeDasharray = circumference;
       el.style.strokeDashoffset = offset;
-      el.style.stroke = score >= 70 ? '#10b981' : score >= 40 ? '#6366f1' : '#f59e0b';
+      const ratio = score / maxScore;
+      el.style.stroke = ratio >= 0.7 ? '#10b981' : ratio >= 0.4 ? '#6366f1' : '#f59e0b';
     });
   }, 50);
 }
@@ -327,6 +334,15 @@ function buildMatchCard(m) {
   const goalLabel = { hackathon:'⚡ Hackathon', project:'🛠 Project', internship:'💼 Internship', freelance:'💰 Freelance' }[u.shortTermGoal] || u.shortTermGoal;
 
   const bd = m.breakdown;
+  
+  let displayScore = m.matchScore;
+  let maxScore = 100;
+  let scoreLabel = 'match';
+  
+  if (activeFilter === 'year') { displayScore = bd.year; maxScore = 10; scoreLabel = 'year'; }
+  else if (activeFilter === 'goals') { displayScore = bd.goals; maxScore = 25; scoreLabel = 'goals'; }
+  else if (activeFilter === 'skills') { displayScore = bd.skills; maxScore = 30; scoreLabel = 'skills'; }
+
   const breakdownHtml = `
     <div class="breakdown-tooltip">
       <div style="font-size:0.75rem;font-weight:700;margin-bottom:0.5rem;color:var(--text-secondary);">Match Breakdown</div>
@@ -338,8 +354,11 @@ function buildMatchCard(m) {
         { label: 'Year', val: bd.year, max: 10 }
       ].map(f => `
         <div class="breakdown-item">
-          <div class="breakdown-label"><span>${f.label}</span><span>${f.val}/${f.max}</span></div>
-          <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width:${(f.val/f.max)*100}%"></div></div>
+          <div class="breakdown-label">
+            <span style="${activeFilter !== 'all' && f.label.toLowerCase().includes(scoreLabel) ? 'color:#111;font-weight:700;' : ''}">${f.label}</span>
+            <span>${f.val}/${f.max}</span>
+          </div>
+          <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width:${(f.val/f.max)*100}%;${activeFilter !== 'all' && f.label.toLowerCase().includes(scoreLabel) ? 'background:#111;' : ''}"></div></div>
         </div>
       `).join('')}
     </div>
@@ -364,11 +383,12 @@ function buildMatchCard(m) {
               <circle class="score-ring-fill" cx="42" cy="42" r="36" stroke-width="5"
                 stroke-dasharray="${circumference}"
                 stroke-dashoffset="${circumference}"
-                data-score="${score}"/>
+                data-score="${displayScore}"
+                data-max="${maxScore}"/>
             </svg>
             <div class="score-ring-text">
-              <span class="score-ring-number">${score}</span>
-              <span class="score-ring-label">match</span>
+              <span class="score-ring-number" style="${activeFilter !== 'all' ? 'font-size:1.15rem;' : ''}">${displayScore}${activeFilter !== 'all' ? `<span style="font-size:0.7rem;color:#888;">/${maxScore}</span>` : ''}</span>
+              <span class="score-ring-label">${scoreLabel}</span>
             </div>
           </div>
           ${breakdownHtml}

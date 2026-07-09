@@ -16,12 +16,11 @@ const Connection = require('../models/Connection');
 function calculateMatchScore(me, them) {
   let score = 0;
   const breakdown = { skills: 0, goals: 0, interests: 0, workStyle: 0, year: 0 };
-
   // — Complementary Skills (30pts) —
-  const myLearning    = (me.learning   || []).map(s => s.toLowerCase());
-  const theirSkills   = (them.skills   || []).map(s => s.toLowerCase());
-  const theirLearning = (them.learning || []).map(s => s.toLowerCase());
-  const mySkills      = (me.skills     || []).map(s => s.toLowerCase());
+  const myLearning    = (me.learning   || []).map(s => s.trim().toLowerCase());
+  const theirSkills   = (them.skills   || []).map(s => s.trim().toLowerCase());
+  const theirLearning = (them.learning || []).map(s => s.trim().toLowerCase());
+  const mySkills      = (me.skills     || []).map(s => s.trim().toLowerCase());
 
   const comp1 = myLearning.filter(s => theirSkills.includes(s)).length;
   const comp2 = theirLearning.filter(s => mySkills.includes(s)).length;

@@ -47,10 +47,10 @@ const yearLabels = { 1:'1st Year', 2:'2nd Year', 3:'3rd Year', 4:'4th Year', 5:'
 function calcScore(me, them) {
   let score = 0;
   const bd = { skills:0, goals:0, interests:0, workStyle:0, year:0 };
-  const myL  = (me.learning||[]).map(s=>s.toLowerCase());
-  const thSk = (them.skills||[]).map(s=>s.toLowerCase());
-  const thL  = (them.learning||[]).map(s=>s.toLowerCase());
-  const mySk = (me.skills||[]).map(s=>s.toLowerCase());
+  const myL  = (me.learning||[]).map(s=>s.trim().toLowerCase());
+  const thSk = (them.skills||[]).map(s=>s.trim().toLowerCase());
+  const thL  = (them.learning||[]).map(s=>s.trim().toLowerCase());
+  const mySk = (me.skills||[]).map(s=>s.trim().toLowerCase());
   const c1 = myL.filter(s=>thSk.includes(s)).length;
   const c2 = thL.filter(s=>mySk.includes(s)).length;
   bd.skills = Math.min(30, Math.round(((c1+c2)/Math.max(myL.length+thL.length,1))*30));
