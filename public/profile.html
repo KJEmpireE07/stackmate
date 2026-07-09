@@ -4,80 +4,329 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>StackMate — My Profile</title>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
-    .profile-hero {
-      background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.06));
-      border: 1px solid rgba(99,102,241,0.15);
-      border-radius: var(--radius-xl);
-      padding: 2.5rem;
-      margin-bottom: 2rem;
-      position: relative; overflow: hidden;
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #ffffff;
+      color: #111;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    .profile-hero::before {
-      content: '';
-      position: absolute; top: -50px; right: -50px;
-      width: 200px; height: 200px;
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; }
+
+    /* ── Dot grid background ── */
+    .dot-grid {
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ══════════════════════════════
+       NAVBAR
+    ══════════════════════════════ */
+    .nav-outer {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 200; padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 0.625rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1.075rem;
+      background: white; border-radius: 14px; padding: 0.5rem 0.875rem;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .logo-icon {
+      width: 30px; height: 30px; background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-size: 0.875rem;
+    }
+    .nav-pill {
+      display: flex; align-items: center; gap: 0.125rem;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 14px; padding: 5px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .nav-item {
+      padding: 0.4375rem 0.9375rem;
+      border-radius: 10px;
+      font-size: 0.875rem; font-weight: 600;
+      color: #555;
+      transition: color 0.18s, background 0.18s;
+    }
+    .nav-item:hover { color: #111; background: rgba(0,0,0,0.05); }
+    .nav-item.active { color: white; background: #111; }
+
+    .nav-actions {
+      display: flex; align-items: center; gap: 0.625rem;
+    }
+    .btn-logout {
+      background: transparent; color: #666;
+      font-size: 0.8125rem; font-weight: 600;
+      height: 40px; padding: 0 0.875rem;
+      transition: color 0.15s;
+      border-radius: 10px;
+    }
+    .btn-logout:hover { color: #ef4444; background: rgba(239,68,68,0.05); }
+
+    /* ══════════════════════════════
+       PAGE WRAPPER
+    ══════════════════════════════ */
+    .page-wrapper {
+      flex: 1;
+      padding: 7.5rem 0 5rem;
+      position: relative; z-index: 1;
+    }
+    .container {
+      width: 100%; max-width: 800px;
+      margin: 0 auto; padding: 0 1.5rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 11px; font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.8125rem; height: 38px;
+      padding: 0 1.125rem; transition: all 0.18s cubic-bezier(0.16,1,0.3,1);
+      border: none; text-decoration: none;
+    }
+    .btn-primary { background: #111; color: white; box-shadow: 0 3px 10px rgba(0,0,0,0.12); }
+    .btn-primary:hover { background: #222; transform: translateY(-1px); }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-outline { background: white; color: #555; border: 1.5px solid #e5e5e0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+    .btn-outline:hover { border-color: #111; color: #111; }
+    .btn-outline:active { transform: scale(0.97); }
+
+    .btn-ghost { background: transparent; color: #666; }
+    .btn-ghost:hover { background: rgba(0,0,0,0.04); color: #111; }
+
+    /* Loading states */
+    .loading-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 0.75rem; padding: 4rem 1rem;
+      color: #999; font-size: 0.875rem; font-weight: 500;
+    }
+    .loading-state .spinner {
+      width: 24px; height: 24px;
+      border: 2px solid rgba(0,0,0,0.1);
+      border-top-color: #111;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(99,102,241,0.12), transparent 70%);
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Profile Hero styling */
+    .profile-hero {
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 24px; padding: 2.25rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.02);
+      margin-bottom: 2rem;
     }
     .profile-top { display: flex; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap; }
-    .profile-meta { flex: 1; }
-    .profile-name { font-size: 1.875rem; font-weight: 800; margin-bottom: 0.25rem; }
-    .profile-role { font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
-    .profile-bio  { font-size: 0.9375rem; color: var(--text-secondary); line-height: 1.6; max-width: 500px; }
-    .profile-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
-    .profile-actions { display: flex; gap: 0.75rem; flex-shrink: 0; }
+    .avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.25rem; flex-shrink: 0;
+    }
+    .profile-meta { flex: 1; min-width: 0; }
+    .profile-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.75rem; font-weight: 700; color: #111;
+      letter-spacing: -0.03em; margin-bottom: 0.375rem;
+    }
+    .profile-role { font-size: 0.9375rem; color: #666; font-weight: 600; margin-bottom: 0.75rem; }
+    .profile-bio { font-size: 0.9rem; color: #555; line-height: 1.6; }
+    .profile-badges { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 1rem; }
+    .profile-actions { display: flex; gap: 0.625rem; flex-shrink: 0; }
 
-    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
-    .info-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
-    .info-card h3 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 1rem; }
-    .info-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.9rem; }
+    /* Info Grid */
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+    .info-card {
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 20px; padding: 1.5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    .info-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8125rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #aaa; margin-bottom: 1.125rem;
+    }
+    .info-row {
+      display: flex; justify-content: space-between; padding: 0.625rem 0;
+      border-bottom: 1px solid #f9f9f9; font-size: 0.875rem;
+    }
     .info-row:last-child { border-bottom: none; }
-    .info-row-label { color: var(--text-secondary); }
-    .info-row-value { font-weight: 600; color: var(--text-primary); text-align: right; max-width: 200px; word-break: break-word; }
+    .info-row-label { color: #666; font-weight: 500; }
+    .info-row-value { font-weight: 700; color: #111; text-align: right; word-break: break-word; }
 
-    .skills-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; }
-    .skills-section h3 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 1rem; }
-    .tags-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    /* Badges & Tags */
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      padding: 0.25rem 0.5rem; border-radius: 6px;
+      background: #fafafa; border: 1px solid #e5e5e0;
+      font-size: 0.75rem; font-weight: 600; color: #555;
+    }
+    .badge-primary { background: #111; color: white; border-color: #111; }
+    .badge-accent { background: #fafafa; border-color: #e5e5e0; color: #111; }
 
-    /* Edit Modal form */
-    .edit-form { display: flex; flex-direction: column; gap: 1.125rem; }
-    .edit-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .skills-section {
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 20px; padding: 1.5rem; margin-bottom: 1.25rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    .skills-section h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8125rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; color: #aaa; margin-bottom: 1rem;
+    }
+    .tags-row { display: flex; flex-wrap: wrap; gap: 0.3125rem; }
+    .skill-tag {
+      padding: 0.2rem 0.5rem; border-radius: 6px;
+      background: #fafafa; border: 1px solid #e5e5e0;
+      font-size: 0.75rem; font-weight: 600; color: #444;
+      display: inline-block;
+    }
 
-    @media (max-width: 768px) {
+    /* ══════════════════════════════
+       MODAL OVERLAY & BOX
+    ══════════════════════════════ */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 500; display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem; backdrop-filter: blur(4px);
+    }
+    .modal {
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 24px; width: 100%; max-width: 540px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.18), 0 5px 15px rgba(0,0,0,0.06);
+      animation: modalFade 0.35s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.95) translateY(12px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-header {
+      padding: 1.5rem 2rem; border-bottom: 1px solid #f0f0f0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem; font-weight: 700; color: #111;
+    }
+    .modal-close {
+      background: none; border: none; font-size: 1.25rem; color: #999;
+      cursor: pointer; transition: color 0.15s;
+    }
+    .modal-close:hover { color: #111; }
+
+    /* Edit Form */
+    .edit-form { padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4375rem; }
+    .form-label { font-size: 0.875rem; font-weight: 600; color: #111; }
+    .form-input, .form-select, .form-textarea {
+      padding: 0.75rem 1rem;
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 12px; font-size: 0.9375rem;
+      font-family: 'Inter', sans-serif; color: #111;
+      outline: none; width: 100%;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.06);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: #bbb; }
+    .form-textarea { height: 90px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* Error details */
+    .form-error {
+      display: none; font-size: 0.875rem; color: #ef4444;
+      background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: 10px; padding: 0.625rem 0.875rem;
+      font-weight: 500;
+    }
+    .form-error.visible { display: block; }
+
+    /* Toast elements */
+    #toast-container {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      z-index: 1000; display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .toast {
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 12px; padding: 0.75rem 1rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      font-size: 0.875rem; font-weight: 600; color: #111;
+      display: flex; align-items: center; gap: 0.5rem;
+      animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes toastIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .profile-top { flex-direction: column; align-items: center; text-align: center; }
+      .profile-actions { flex-direction: column; width: 100%; }
+      .profile-actions .btn { width: 100%; }
       .info-grid { grid-template-columns: 1fr; }
-      .profile-actions { flex-direction: column; }
+      .form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="mesh-bg"></div>
+
+  <!-- Dot Grid Background -->
+  <div class="dot-grid" aria-hidden="true"></div>
 
   <!-- Navbar -->
-  <nav class="navbar">
-    <a href="index.html" class="navbar-brand">
+  <nav class="nav-outer">
+    <a href="dashboard.html" class="nav-logo">
       <div class="logo-icon">⚡</div>
       StackMate
     </a>
-    <div class="navbar-links">
-      <a href="dashboard.html">Discover</a>
-      <a href="profile.html" class="active">Profile</a>
+
+    <div class="nav-pill">
+      <a href="dashboard.html" class="nav-item">Discover</a>
+      <a href="profile.html" class="nav-item active">Profile</a>
     </div>
-    <div class="navbar-actions">
-      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+
+    <div class="nav-actions">
+      <button class="btn-logout" onclick="logout()">Sign Out</button>
     </div>
   </nav>
 
-  <div class="page-wrapper">
-    <div class="container" style="padding-top:2rem;padding-bottom:4rem;">
-      <div id="profile-loading" class="loading-state"><div class="spinner"></div><span>Loading profile...</span></div>
+  <!-- Page Wrapper -->
+  <main class="page-wrapper">
+    <div class="container">
+      
+      <!-- Loading indicator -->
+      <div id="profile-loading" class="loading-state">
+        <div class="spinner"></div>
+        <span>Loading profile...</span>
+      </div>
+
+      <!-- Loaded content wrapper -->
       <div id="profile-content" style="display:none;">
 
-        <!-- Profile Hero -->
+        <!-- Profile Hero Card -->
         <div class="profile-hero">
           <div class="profile-top">
-            <div class="avatar avatar-xl" id="p-avatar"></div>
+            <div class="avatar" id="p-avatar"></div>
             <div class="profile-meta">
               <h1 class="profile-name" id="p-name"></h1>
               <p class="profile-role" id="p-role"></p>
@@ -86,12 +335,12 @@
             </div>
             <div class="profile-actions">
               <button class="btn btn-primary" onclick="openEditModal()">✏️ Edit Profile</button>
-              <a href="dashboard.html" class="btn btn-outline">← Back to Matches</a>
+              <a href="dashboard.html" class="btn btn-outline">← Matches</a>
             </div>
           </div>
         </div>
 
-        <!-- Info Grid -->
+        <!-- Details Info Grid -->
         <div class="info-grid">
           <div class="info-card">
             <h3>Academic Info</h3>
@@ -108,7 +357,7 @@
           </div>
         </div>
 
-        <!-- Skills -->
+        <!-- Skills Panels -->
         <div class="skills-section">
           <h3>Skills I Have</h3>
           <div class="tags-row" id="p-skills"></div>
@@ -121,11 +370,12 @@
           <h3>Project Interests</h3>
           <div class="tags-row" id="p-interests"></div>
         </div>
+
       </div><!-- /profile-content -->
     </div>
-  </div>
+  </main>
 
-  <!-- Edit Modal -->
+  <!-- Edit Overlay Modal -->
   <div class="modal-overlay" id="edit-modal" style="display:none;" onclick="handleOverlayClick(event)">
     <div class="modal">
       <div class="modal-header">
@@ -163,14 +413,14 @@
         </div>
         <div class="form-group">
           <label class="form-label">Bio</label>
-          <textarea class="form-input form-textarea" id="edit-bio" placeholder="Short bio about yourself..."></textarea>
+          <textarea class="form-textarea" id="edit-bio" placeholder="Short bio about yourself..."></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">Skills I Have <span style="color:var(--text-muted);font-weight:400;font-size:0.8125rem;">(comma separated)</span></label>
+          <label class="form-label">Skills I Have <span style="color:#aaa;font-weight:400;font-size:0.8125rem;">(comma separated)</span></label>
           <input class="form-input" type="text" id="edit-skills" placeholder="e.g. React, Node.js, Python"/>
         </div>
         <div class="form-group">
-          <label class="form-label">Currently Learning <span style="color:var(--text-muted);font-weight:400;font-size:0.8125rem;">(comma separated)</span></label>
+          <label class="form-label">Currently Learning <span style="color:#aaa;font-weight:400;font-size:0.8125rem;">(comma separated)</span></label>
           <input class="form-input" type="text" id="edit-learning" placeholder="e.g. Machine Learning, Flutter"/>
         </div>
         <div class="form-group">
@@ -178,17 +428,19 @@
           <input class="form-input" type="url" id="edit-github" placeholder="https://github.com/yourusername"/>
         </div>
         <div class="form-group">
-          <label class="form-label">Character Color <span style="color:var(--text-muted);font-weight:400;font-size:0.8125rem;">— shown in virtual room</span></label>
+          <label class="form-label">Character Color <span style="color:#aaa;font-weight:400;font-size:0.8125rem;">— shown in virtual room</span></label>
           <div style="display:flex;align-items:center;gap:0.75rem;">
             <input type="color" id="edit-character-color" value="#6366f1"
               style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:2px;"/>
-            <div id="color-preview" style="flex:1;height:40px;border-radius:8px;background:#6366f1;transition:background 0.2s;display:flex;align-items:center;justify-content:center;">
+            <div id="color-preview" style="flex:1;height:40px;border-radius:8px;background:#6366f1;transition:background 0.2s;display:flex;align-items:center;justify-content:center;border:1px solid #e5e5e0;">
               <span style="font-size:1.25rem;">🧑‍💻</span>
             </div>
           </div>
         </div>
+        
         <div id="edit-error" class="form-error"></div>
-        <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+        
+        <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:0.5rem;">
           <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
           <button class="btn btn-primary" id="save-btn" onclick="saveProfile()">Save Changes</button>
         </div>
