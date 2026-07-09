@@ -287,6 +287,10 @@ function renderMatches() {
     filtered = allMatches.filter(m => m.breakdown.goals > 0);
   } else if (activeFilter === 'skills') {
     filtered = allMatches.filter(m => m.breakdown.skills > 0);
+  } else if (activeFilter === 'interests') {
+    filtered = allMatches.filter(m => m.breakdown.interests > 0);
+  } else if (activeFilter === 'workStyle') {
+    filtered = allMatches.filter(m => m.breakdown.workStyle > 0);
   }
 
   if (!filtered.length) {
@@ -342,6 +346,8 @@ function buildMatchCard(m) {
   if (activeFilter === 'year') { displayScore = bd.year; maxScore = 10; scoreLabel = 'year'; }
   else if (activeFilter === 'goals') { displayScore = bd.goals; maxScore = 25; scoreLabel = 'goals'; }
   else if (activeFilter === 'skills') { displayScore = bd.skills; maxScore = 30; scoreLabel = 'skills'; }
+  else if (activeFilter === 'interests') { displayScore = bd.interests; maxScore = 20; scoreLabel = 'interests'; }
+  else if (activeFilter === 'workStyle') { displayScore = bd.workStyle; maxScore = 15; scoreLabel = 'style'; }
 
   const breakdownHtml = `
     <div class="breakdown-tooltip">
