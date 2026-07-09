@@ -5,75 +5,336 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>StackMate — Complete Your Profile</title>
   <meta name="description" content="Tell us about yourself so we can find your perfect coding partner."/>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
-    .onboarding-page {
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #ffffff;
+      color: #111;
+      -webkit-font-smoothing: antialiased;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    a { text-decoration: none; color: inherit; }
+    input, select, textarea { font-family: inherit; }
+    button { font-family: inherit; cursor: pointer; }
+
+    /* ── Dot grid background ── */
+    .dot-grid {
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Main Container ── */
+    .onboarding-page {
+      flex: 1;
       display: flex; align-items: center; justify-content: center;
-      padding: 2rem;
+      padding: 3rem 1.5rem;
+      position: relative; z-index: 1;
+      width: 100%;
+    }
+    .onboarding-wrap {
+      width: 100%; max-width: 620px;
+      animation: fadeUp 0.55s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header styling */
+    .onboarding-header {
+      text-align: center; margin-bottom: 2.25rem;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .onboarding-logo {
+      display: inline-flex; align-items: center; gap: 0.625rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1.25rem;
+      background: white; border-radius: 12px; padding: 0.4rem 0.8rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 2rem;
+    }
+    .logo-icon {
+      width: 28px; height: 28px; background: #111; color: white;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; font-size: 0.8125rem;
+    }
+
+    /* Progress bar steps */
+    .progress-steps {
+      display: flex; align-items: center; width: 100%; max-width: 500px;
+      justify-content: space-between;
+    }
+    .progress-step {
+      display: flex; flex-direction: column; align-items: center; gap: 0.375rem;
       position: relative; z-index: 1;
     }
-    .onboarding-wrap { width: 100%; max-width: 580px; }
-    .onboarding-header { text-align: center; margin-bottom: 2rem; }
-    .onboarding-logo { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 1.25rem; margin-bottom: 1.5rem; }
-    .onboarding-logo .logo-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; }
-    .onboarding-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2.5rem; backdrop-filter: blur(20px); }
-    .step-panel { display: none; animation: fadeInUp 0.4s ease; }
-    .step-panel.active { display: block; }
-    .step-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.375rem; }
-    .step-subtitle { font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; }
-    .step-form { display: flex; flex-direction: column; gap: 1.125rem; }
-    .step-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 2rem; }
+    .step-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: white; border: 1.5px solid #e5e5e0;
+      color: #999; font-weight: 700; font-size: 0.8125rem;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .step-label {
+      font-size: 0.75rem; font-weight: 600; color: #aaa;
+      transition: color 0.3s;
+    }
+    .step-connector {
+      flex: 1; height: 2px; background: #e5e5e0;
+      margin: 0 -15px; margin-top: -18px;
+      transition: background 0.3s;
+    }
+
+    /* Progress step states */
+    .progress-step.active .step-circle {
+      border-color: #111; background: #111; color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .progress-step.active .step-label { color: #111; font-weight: 700; }
+    .progress-step.done .step-circle {
+      border-color: #111; background: white; color: #111;
+    }
+    .progress-step.done .step-label { color: #555; }
+    .step-connector.done { background: #111; }
+
+    /* Onboarding Card styling */
+    .onboarding-card {
+      background: white; border: 1px solid #e5e5e0;
+      border-radius: 24px; padding: 2.75rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .step-panel { display: none; }
+    .step-panel.active { display: block; animation: panelFade 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+    @keyframes panelFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.625rem; font-weight: 700;
+      letter-spacing: -0.03em; margin-bottom: 0.375rem;
+      color: #111;
+    }
+    .step-subtitle {
+      font-size: 0.9375rem; color: #666; font-weight: 500;
+      margin-bottom: 2rem; line-height: 1.6;
+    }
+
+    .step-form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    /* Step nav action buttons */
+    .step-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 2.25rem; padding-top: 1.5rem;
+      border-top: 1px solid #e5e5e0;
+    }
+
+    /* Custom form styling */
+    .form-group { display: flex; flex-direction: column; gap: 0.4375rem; }
+    .form-label { font-size: 0.875rem; font-weight: 600; color: #111; }
+    .form-input, .form-select, .form-textarea {
+      padding: 0.75rem 1rem;
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 12px; font-size: 0.9375rem;
+      font-family: 'Inter', sans-serif; color: #111;
+      outline: none; width: 100%;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #111;
+      box-shadow: 0 0 0 4px rgba(0,0,0,0.06);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: #bbb; }
+    .form-textarea { height: 100px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* Role selection cards */
+    .option-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .option-card {
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 16px; padding: 1.375rem;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+      display: flex; flex-direction: column; gap: 0.5rem;
+      text-align: left;
+    }
+    .option-card:hover {
+      border-color: #111;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    }
+    .option-card.selected {
+      border-color: #111; background: #fafafa;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .option-card-icon { font-size: 1.5rem; line-height: 1; }
+    .option-card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: #111;
+    }
+    .option-card-desc { font-size: 0.8125rem; color: #666; line-height: 1.5; }
+
+    /* Goal selections */
     .goal-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
     .goal-option {
-      padding: 1rem;
-      border: 2px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-      background: var(--bg-card);
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 12px; padding: 0.875rem 1rem;
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+      display: flex; align-items: center; gap: 0.625rem;
     }
-    .goal-option:hover { border-color: rgba(99,102,241,0.4); background: var(--bg-card-hover); }
-    .goal-option.selected { border-color: var(--color-primary); background: rgba(99,102,241,0.1); }
-    .goal-option-icon { font-size: 1.5rem; margin-bottom: 0.375rem; }
-    .goal-option-label { font-size: 0.875rem; font-weight: 600; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .hours-display { text-align: center; font-size: 1.75rem; font-weight: 800; color: var(--color-primary); margin-bottom: 0.5rem; }
-    .interest-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .interest-chip {
-      padding: 0.4rem 0.875rem;
-      border: 1.5px solid var(--border);
-      border-radius: 100px;
-      font-size: 0.8125rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
-      color: var(--text-secondary);
+    .goal-option:hover { border-color: #111; }
+    .goal-option.selected { border-color: #111; background: #fafafa; }
+    .goal-option-icon { font-size: 1.25rem; line-height: 1; }
+    .goal-option-label { font-size: 0.875rem; font-weight: 600; color: #111; }
+
+    /* Tags container inputs */
+    .tags-container {
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 12px; padding: 0.5rem;
+      display: flex; flex-wrap: wrap; gap: 0.375rem; align-items: center;
+      min-height: 48px; cursor: text;
     }
-    .interest-chip:hover { border-color: var(--color-primary); color: var(--color-primary); }
-    .interest-chip.selected { border-color: var(--color-primary); background: rgba(99,102,241,0.12); color: var(--color-primary); }
+    .tag-input {
+      border: none; outline: none; font-size: 0.9rem;
+      padding: 0.25rem 0.5rem; flex: 1; min-width: 120px;
+      font-family: inherit; color: #111;
+    }
+    .tag-input::placeholder { color: #bbb; }
+    .tag-chip {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      background: #f0f0f0; border-radius: 6px;
+      padding: 0.25rem 0.5rem; font-size: 0.8125rem; font-weight: 600;
+      color: #333;
+    }
+    .tag-chip button {
+      background: none; border: none; font-size: 0.875rem;
+      color: #888; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; border-radius: 50%;
+    }
+    .tag-chip button:hover { color: #111; background: rgba(0,0,0,0.06); }
+
+    /* Hours slider */
+    .hours-display {
+      font-family: 'Space Grotesk', sans-serif;
+      text-align: center; font-size: 1.875rem; font-weight: 700;
+      color: #111; margin-bottom: 0.25rem; letter-spacing: -0.02em;
+    }
+    .range-slider {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      background: #e5e5e0; border-radius: 99px; outline: none;
+      margin: 1rem 0;
+    }
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #111; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+      transition: transform 0.15s;
+    }
+    .range-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+    /* Work Style */
     .style-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+
+    /* Interest chips */
+    .interest-options { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+    .interest-chip {
+      background: white; border: 1.5px solid #e5e5e0;
+      border-radius: 99px; padding: 0.375rem 0.875rem;
+      font-size: 0.8125rem; font-weight: 600; color: #555;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .interest-chip:hover { border-color: #111; color: #111; }
+    .interest-chip.selected { border-color: #111; background: #111; color: white; }
+
+    /* Mesa styled buttons */
+    .btn-black-nav {
+      display: inline-flex; align-items: center;
+      height: 48px; border-radius: 12px;
+      background: #111; color: white;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.875rem;
+      padding: 0 1.25rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.14);
+      transition: all 0.18s cubic-bezier(0.16,1,0.3,1);
+      border: none;
+    }
+    .btn-black-nav:hover { background: #222; transform: translateY(-1px); }
+    .btn-black-nav:active { transform: scale(0.97); }
+    .btn-black-nav:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .btn-white-nav {
+      display: inline-flex; align-items: center;
+      height: 48px; border-radius: 12px;
+      background: white; color: #555;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 0.875rem;
+      padding: 0 1.25rem;
+      border: 1.5px solid #e5e5e0;
+      transition: all 0.18s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-white-nav:hover { color: #111; border-color: #111; }
+    .btn-white-nav:active { transform: scale(0.97); }
+
+    /* Spinner */
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      display: inline-block; vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .onboarding-card { padding: 1.75rem 1.25rem; }
+      .option-cards, .goal-options, .style-options { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="mesh-bg"></div>
 
+  <!-- Dot Grid -->
+  <div class="dot-grid" aria-hidden="true"></div>
+
+  <!-- Onboarding Page Container -->
   <div class="onboarding-page">
-    <div class="onboarding-wrap anim-fade-up">
+    <div class="onboarding-wrap">
+      
+      <!-- Onboarding Header -->
       <div class="onboarding-header">
-        <div class="onboarding-logo">
+        <a href="index.html" class="onboarding-logo">
           <div class="logo-icon">⚡</div>
           StackMate
-        </div>
-        <!-- Progress -->
+        </a>
+        
+        <!-- Progress dynamic layout -->
         <div class="progress-steps" id="progress-steps">
-          <!-- Rendered by JS -->
+          <!-- Rendered by js/onboarding.js -->
         </div>
       </div>
 
+      <!-- Content card box -->
       <div class="onboarding-card">
-        <!-- STEP 1: Who are you? -->
+
+        <!-- STEP 1: Role -->
         <div class="step-panel active" id="step-1">
           <h2 class="step-title">Who are you? 👋</h2>
           <p class="step-subtitle">Tell us your role so we can tailor your experience.</p>
@@ -91,7 +352,7 @@
           </div>
           <div class="step-nav">
             <div></div>
-            <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+            <button class="btn-black-nav" onclick="nextStep()">Next →</button>
           </div>
         </div>
 
@@ -106,7 +367,7 @@
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label" for="program">Program</label>
+                <label class="form-label" for="program">Program / Major</label>
                 <input class="form-input" type="text" id="program" placeholder="e.g. B.Tech CSE, BCA, MCA"/>
               </div>
               <div class="form-group" id="year-group">
@@ -121,13 +382,13 @@
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label" for="bio">Short Bio <span style="color:var(--text-muted)">(optional)</span></label>
-              <textarea class="form-input form-textarea" id="bio" placeholder="Tell potential partners a bit about yourself..."></textarea>
+              <label class="form-label" for="bio">Short Bio <span style="font-weight:normal;color:#888;">(optional)</span></label>
+              <textarea class="form-textarea" id="bio" placeholder="Tell potential partners a bit about yourself..."></textarea>
             </div>
           </div>
           <div class="step-nav">
-            <button class="btn btn-outline" onclick="prevStep()">← Back</button>
-            <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+            <button class="btn-white-nav" onclick="prevStep()">← Back</button>
+            <button class="btn-black-nav" onclick="nextStep()">Next →</button>
           </div>
         </div>
 
@@ -141,19 +402,19 @@
               <div class="tags-container" id="skills-container" onclick="document.getElementById('skills-input').focus()">
                 <input class="tag-input" id="skills-input" placeholder="Type a skill and press Enter..." onkeydown="handleTagInput(event, 'skills')"/>
               </div>
-              <span style="font-size:0.75rem;color:var(--text-muted);">e.g. React, Python, Node.js, SQL</span>
+              <span style="font-size:0.75rem;color:#888;">e.g. React, Python, Node.js, SQL</span>
             </div>
             <div class="form-group">
               <label class="form-label">What you're currently learning</label>
               <div class="tags-container" id="learning-container" onclick="document.getElementById('learning-input').focus()">
                 <input class="tag-input" id="learning-input" placeholder="Type a skill and press Enter..." onkeydown="handleTagInput(event, 'learning')"/>
               </div>
-              <span style="font-size:0.75rem;color:var(--text-muted);">e.g. Machine Learning, Flutter, GraphQL</span>
+              <span style="font-size:0.75rem;color:#888;">e.g. Machine Learning, Flutter, GraphQL</span>
             </div>
           </div>
           <div class="step-nav">
-            <button class="btn btn-outline" onclick="prevStep()">← Back</button>
-            <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+            <button class="btn-white-nav" onclick="prevStep()">← Back</button>
+            <button class="btn-black-nav" onclick="nextStep()">Next →</button>
           </div>
         </div>
 
@@ -206,8 +467,8 @@
             </div>
           </div>
           <div class="step-nav">
-            <button class="btn btn-outline" onclick="prevStep()">← Back</button>
-            <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+            <button class="btn-white-nav" onclick="prevStep()">← Back</button>
+            <button class="btn-black-nav" onclick="nextStep()">Next →</button>
           </div>
         </div>
 
@@ -226,23 +487,23 @@
               <div class="style-options">
                 <div class="option-card selected" data-value="sync" onclick="selectWorkStyle(this)">
                   <div class="option-card-icon">🤝</div>
-                  <div class="option-card-title" style="font-size:0.875rem;">Sync</div>
-                  <div class="option-card-desc" style="font-size:0.7rem;">Live calls, real-time</div>
+                  <div class="option-card-title">Sync</div>
+                  <div class="option-card-desc">Live calls, real-time</div>
                 </div>
                 <div class="option-card" data-value="async" onclick="selectWorkStyle(this)">
                   <div class="option-card-icon">📨</div>
-                  <div class="option-card-title" style="font-size:0.875rem;">Async</div>
-                  <div class="option-card-desc" style="font-size:0.7rem;">Messages, PRs, own pace</div>
+                  <div class="option-card-title">Async</div>
+                  <div class="option-card-desc">Slack, PRs, own pace</div>
                 </div>
                 <div class="option-card" data-value="both" onclick="selectWorkStyle(this)">
                   <div class="option-card-icon">⚡</div>
-                  <div class="option-card-title" style="font-size:0.875rem;">Both</div>
-                  <div class="option-card-desc" style="font-size:0.7rem;">Flexible, whatever works</div>
+                  <div class="option-card-title">Both</div>
+                  <div class="option-card-desc">Flexible hybrid model</div>
                 </div>
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Project Interests <span style="color:var(--text-muted)">(select all that apply)</span></label>
+              <label class="form-label">Project Interests <span style="font-weight:normal;color:#888;">(select all that apply)</span></label>
               <div class="interest-options" id="interest-options">
                 <div class="interest-chip" data-value="Web Dev" onclick="toggleInterest(this)">🌐 Web Dev</div>
                 <div class="interest-chip" data-value="AI/ML" onclick="toggleInterest(this)">🤖 AI/ML</div>
@@ -260,15 +521,16 @@
             </div>
           </div>
 
-          <div id="submit-error" style="color:#fca5a5;font-size:0.875rem;margin-top:0.75rem;display:none;"></div>
+          <div id="submit-error" style="color:#ef4444;font-size:0.875rem;margin-top:1rem;display:none;background:#fef2f2;border:1px solid #fecaca;padding:0.625rem 0.875rem;border-radius:10px;font-weight:500;"></div>
 
           <div class="step-nav">
-            <button class="btn btn-outline" onclick="prevStep()">← Back</button>
-            <button class="btn btn-primary btn-lg" id="finish-btn" onclick="submitOnboarding()">
+            <button class="btn-white-nav" onclick="prevStep()">← Back</button>
+            <button class="btn-black-nav" id="finish-btn" onclick="submitOnboarding()">
               🚀 Find My Matches
             </button>
           </div>
         </div>
+
       </div>
     </div>
   </div>

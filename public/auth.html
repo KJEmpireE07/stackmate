@@ -321,8 +321,84 @@
 <body>
 
   <div class="auth-layout">
-
+    
     <!-- ── Left Dark Panel ── -->
+    
+    <!-- ── Right Form Panel ── -->
+    <div class="auth-right">
+      <a href="index.html" class="back-home">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to home
+      </a>
+      
+      <div class="auth-form-wrap">
+        
+        <div class="auth-form-heading">
+          <h1 id="form-title">Welcome back</h1>
+          <p id="form-subtitle">Sign in to your StackMate account.</p>
+        </div>
+        
+        <!-- Tab switcher -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign in</button>
+          <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+        </div>
+        
+        <!-- Error -->
+        <div id="auth-error"></div>
+        
+        <!-- ── Login Panel ── -->
+        <div class="auth-panel active" id="panel-login">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Email</label>
+            <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="pw-wrap">
+              <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+              <button class="pw-toggle" type="button" onclick="togglePassword('login-password', this)">👁</button>
+            </div>
+          </div>
+          <button class="auth-submit" id="login-btn" onclick="handleLogin()">
+            Sign in
+          </button>
+        </div>
+        
+        <!-- ── Register Panel ── -->
+        <div class="auth-panel" id="panel-register">
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Full name</label>
+            <input class="form-input" type="text" id="reg-name" placeholder="Aryan Mehta" autocomplete="name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Password</label>
+            <div class="pw-wrap">
+              <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 characters"
+              autocomplete="new-password" oninput="updateStrength(this.value)"/>
+              <button class="pw-toggle" type="button" onclick="togglePassword('reg-password', this)">👁</button>
+            </div>
+            <div class="strength-wrap">
+              <div class="strength-bg"><div id="strength-bar"></div></div>
+              <div class="strength-label">Password strength</div>
+            </div>
+          </div>
+          <button class="auth-submit" id="register-btn" onclick="handleRegister()">
+            Create account
+          </button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="auth-footer-link" id="auth-footer-link">
+          Don't have an account? <a href="#" id="footer-switch-link" onclick="switchTab('register'); return false;">Register free</a>
+        </div>
+        
+      </div>
+    </div>
     <div class="auth-left">
       <div class="auth-blob auth-blob-1"></div>
       <div class="auth-blob auth-blob-2"></div>
@@ -364,82 +440,6 @@
             <div class="auth-quote-role">CS Year 3 · IIT Mumbai</div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- ── Right Form Panel ── -->
-    <div class="auth-right">
-      <a href="index.html" class="back-home">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-        Back to home
-      </a>
-
-      <div class="auth-form-wrap">
-
-        <div class="auth-form-heading">
-          <h1 id="form-title">Welcome back</h1>
-          <p id="form-subtitle">Sign in to your StackMate account.</p>
-        </div>
-
-        <!-- Tab switcher -->
-        <div class="auth-tabs">
-          <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Sign in</button>
-          <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
-        </div>
-
-        <!-- Error -->
-        <div id="auth-error"></div>
-
-        <!-- ── Login Panel ── -->
-        <div class="auth-panel active" id="panel-login">
-          <div class="form-group">
-            <label class="form-label" for="login-email">Email</label>
-            <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="login-password">Password</label>
-            <div class="pw-wrap">
-              <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
-              <button class="pw-toggle" type="button" onclick="togglePassword('login-password', this)">👁</button>
-            </div>
-          </div>
-          <button class="auth-submit" id="login-btn" onclick="handleLogin()">
-            Sign in
-          </button>
-        </div>
-
-        <!-- ── Register Panel ── -->
-        <div class="auth-panel" id="panel-register">
-          <div class="form-group">
-            <label class="form-label" for="reg-name">Full name</label>
-            <input class="form-input" type="text" id="reg-name" placeholder="Aryan Mehta" autocomplete="name"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-email">Email</label>
-            <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" autocomplete="email"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="reg-password">Password</label>
-            <div class="pw-wrap">
-              <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 characters"
-                autocomplete="new-password" oninput="updateStrength(this.value)"/>
-              <button class="pw-toggle" type="button" onclick="togglePassword('reg-password', this)">👁</button>
-            </div>
-            <div class="strength-wrap">
-              <div class="strength-bg"><div id="strength-bar"></div></div>
-              <div class="strength-label">Password strength</div>
-            </div>
-          </div>
-          <button class="auth-submit" id="register-btn" onclick="handleRegister()">
-            Create account
-          </button>
-        </div>
-
-        <!-- Footer -->
-        <div class="auth-footer-link" id="auth-footer-link">
-          Don't have an account? <a href="#" id="footer-switch-link" onclick="switchTab('register'); return false;">Register free</a>
-        </div>
-
       </div>
     </div>
   </div>
