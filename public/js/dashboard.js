@@ -76,11 +76,20 @@ async function loadRequests() {
   try {
     pendingRequests = await apiFetch('/api/connect/requests');
     const badge = document.getElementById('notif-badge');
+    const mobileBadge = document.getElementById('mobile-notif-badge');
+    
     if (pendingRequests.length > 0) {
-      badge.style.display = 'flex';
-      badge.textContent = pendingRequests.length;
+      if (badge) {
+        badge.style.display = 'flex';
+        badge.textContent = pendingRequests.length;
+      }
+      if (mobileBadge) {
+        mobileBadge.style.display = 'flex';
+        mobileBadge.textContent = pendingRequests.length;
+      }
     } else {
-      badge.style.display = 'none';
+      if (badge) badge.style.display = 'none';
+      if (mobileBadge) mobileBadge.style.display = 'none';
     }
     renderRequests();
   } catch (e) { /* silent */ }
@@ -482,8 +491,25 @@ function closeCreateRoomModal() {
   document.getElementById('create-room-modal').style.display = 'none';
 }
 function nextRoomStep(step) {
+  if (step === 2) {
+    const nameInput = document.getElementById('room-name-input');
+    const err = document.getElementById('room-name-error');
+    if (!nameInput.value.trim()) {
+      nameInput.classList.add('input-error');
+      err.textContent = 'Room name is required';
+      err.style.display = 'block';
+      return;
+    }
+  }
   document.querySelectorAll('.room-step').forEach(el => el.style.display = 'none');
   document.getElementById('room-step-' + step).style.display = 'block';
+}
+
+function clearRoomNameError() {
+  const nameInput = document.getElementById('room-name-input');
+  const err = document.getElementById('room-name-error');
+  if (nameInput) nameInput.classList.remove('input-error');
+  if (err) err.style.display = 'none';
 }
 
 async function loadRoomFriends() {
@@ -528,7 +554,12 @@ async function submitCreateRoom() {
   const memberCheckboxes = document.querySelectorAll('.room-member-checkbox:checked');
   const members = Array.from(memberCheckboxes).map(cb => cb.value);
 
-  if (!name) return showToast('Room name is required', 'error');
+  // Re-verify name just in case
+  if (!name) {
+    nextRoomStep(1); // Switch to step 1
+    nextRoomStep(2); // Trigger validation (which shows error and prevents switching to step 2)
+    return;
+  }
 
   const btn = document.getElementById('create-room-btn');
   btn.innerText = 'Creating...';

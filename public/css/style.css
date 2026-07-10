@@ -213,6 +213,17 @@ ul { list-style: none; }
 }
 
 /* ── Form Elements ──────────────────────────────────────────── */
+
+/* Inline Errors */
+.input-error {
+  border-color: var(--color-danger) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+.inline-error {
+  animation: fadeUp 0.2s ease forwards;
+}
+
+/* ── Utilities ──────────────────────────────────────────────── */
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
 .form-label {
   font-size: 0.8125rem;

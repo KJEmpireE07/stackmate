@@ -11,7 +11,7 @@ router.post('/save', auth, async (req, res) => {
       skills, learning,
       shortTermGoal, longTermGoal,
       hoursPerWeek, workStyle, projectInterests,
-      bio
+      bio, github
     } = req.body;
 
     const user = await User.findByIdAndUpdate(
@@ -21,7 +21,7 @@ router.post('/save', auth, async (req, res) => {
         skills, learning,
         shortTermGoal, longTermGoal,
         hoursPerWeek, workStyle, projectInterests,
-        bio,
+        bio, github,
         onboardingComplete: true
       },
       { new: true }

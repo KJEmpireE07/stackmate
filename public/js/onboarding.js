@@ -200,7 +200,8 @@ async function submitOnboarding() {
     hoursPerWeek:    state.hoursPerWeek,
     workStyle:       state.workStyle,
     projectInterests: state.projectInterests,
-    bio:             document.getElementById('bio')?.value.trim() || ''
+    bio:             document.getElementById('bio')?.value.trim() || '',
+    github:          document.getElementById('github')?.value.trim() || ''
   };
 
   try {
