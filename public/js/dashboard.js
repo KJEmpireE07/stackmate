@@ -489,9 +489,9 @@ function nextRoomStep(step) {
 async function loadRoomFriends() {
   try {
     const connections = await apiFetch('/api/connect/all');
-    const me = getUser();
+    const meId = getUser()?.id;
     roomFriends = connections.map(c => {
-      return c.from._id === me._id ? c.to : c.from;
+      return c.from._id === meId || c.from === meId ? c.to : c.from;
     });
     renderRoomFriends(roomFriends);
   } catch (e) {

@@ -43,7 +43,7 @@ async function apiFetch(url, options = {}) {
 // Initialization
 async function init() {
   try {
-    currentUser = await apiFetch('/api/auth/me');
+    currentUser = await apiFetch('/api/profile/me');
     roomData = await apiFetch(`/api/rooms/${roomId}`);
     
     // Update Header UI
