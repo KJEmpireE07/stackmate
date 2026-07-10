@@ -111,7 +111,6 @@ async function removeConnection(connectionId) {
 function renderConnections(connections) {
   const section = document.getElementById('connections-section');
   const grid    = document.getElementById('connections-grid');
-  const count   = document.getElementById('connections-count');
   const myId    = getUser()?.id;
 
   if (!connections || connections.length === 0) {
@@ -120,7 +119,6 @@ function renderConnections(connections) {
   }
 
   section.style.display = 'block';
-  count.textContent = `${connections.length}/3`;
 
   grid.innerHTML = connections.map(c => {
     const partner = c.from._id === myId || c.from === myId ? c.to : c.from;
