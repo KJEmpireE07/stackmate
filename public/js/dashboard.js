@@ -490,11 +490,10 @@ function nextRoomStep(step) {
 
 async function loadRoomFriends() {
   try {
-    const token = localStorage.getItem('token');
-    const res = await fetch('/api/connect/all', { headers: { 'Authorization': `Bearer ${token}` } });
-    const connections = await res.json();
+    const connections = await apiFetch('/api/connect/all');
+    const me = getUser();
     roomFriends = connections.map(c => {
-      return c.from._id === currentUser._id ? c.to : c.from;
+      return c.from._id === me._id ? c.to : c.from;
     });
     renderRoomFriends(roomFriends);
   } catch (e) {
@@ -538,14 +537,10 @@ async function submitCreateRoom() {
   btn.disabled = true;
 
   try {
-    const token = localStorage.getItem('token');
-    const res = await fetch('/api/rooms/create', {
+    const data = await apiFetch('/api/rooms/create', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ name, category, members })
+      body: { name, category, members }
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message);
     
     window.location.href = `room-chat.html?roomId=${data.room._id}`;
   } catch (e) {
@@ -561,9 +556,7 @@ async function openRoomsDrawer() {
   container.innerHTML = '<div class="spinner" style="margin:2rem auto;"></div>';
   
   try {
-    const token = localStorage.getItem('token');
-    const res = await fetch('/api/rooms', { headers: { 'Authorization': `Bearer ${token}` } });
-    const rooms = await res.json();
+    const rooms = await apiFetch('/api/rooms');
     
     if (rooms.length === 0) {
       container.innerHTML = '<div style="color:#666;text-align:center;margin-top:2rem;">You are not in any rooms yet.</div>';
