@@ -25,7 +25,7 @@ function showToast(message, type = 'success') {
 
 // Custom API Fetch Wrapper
 async function apiFetch(url, options = {}) {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('sm_token');
   if (!token) {
     window.location.href = 'index.html';
     return;
@@ -86,7 +86,7 @@ async function init() {
 }
 
 function setupSocket() {
-  socket = io({ auth: { token: localStorage.getItem('token') } });
+  socket = io({ auth: { token: localStorage.getItem('sm_token') } });
   
   socket.emit('joinRoom', roomId);
 
