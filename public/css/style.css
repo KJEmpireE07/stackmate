@@ -112,6 +112,7 @@ ul { list-style: none; }
   background: rgba(6, 12, 26, 0.8);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
+  opacity: 1;
 }
 .navbar-brand {
   display: flex;

@@ -436,7 +436,7 @@
 
   <!-- Navbar -->
   <nav class="nav-outer">
-    <a href="dashboard.html" class="nav-logo">
+    <a href="index.html" class="nav-logo">
       <div class="logo-icon">⚡</div>
       StackMate
     </a>
@@ -483,7 +483,11 @@
           <h1 class="dashboard-title">Your Matches 🎯</h1>
           <p class="dashboard-subtitle">Ranked by how well you complement each other</p>
         </div>
-        <a href="profile.html" class="btn btn-outline">Edit Profile</a>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn btn-outline" onclick="openRoomsDrawer()">All Rooms</button>
+          <button class="btn btn-primary" onclick="openCreateRoomModal()">Create Room</button>
+          <a href="profile.html" class="btn btn-outline">Edit Profile</a>
+        </div>
       </div>
 
       <!-- My Connections Section (hidden unless loaded by JS) -->
@@ -508,15 +512,6 @@
         <button class="filter-chip" data-filter="year" onclick="setFilter('year', this)">🎓 Year</button>
       </div>
 
-      <!-- At Limit Warning Banner -->
-      <div id="limit-banner" style="display:none;">
-        <span style="font-size:1.25rem;">🔒</span>
-        <div>
-          <div style="font-weight:700;color:#92400e;font-size:0.875rem;">You've reached your connection limit (3/3)</div>
-          <div style="font-size:0.8125rem;color:#b45309;margin-top:0.125rem;">You can still discover matches, but you'll need to remove an active connection before sending new requests.</div>
-        </div>
-      </div>
-
       <!-- Matches Cards Grid -->
       <div id="matches-grid" class="matches-grid">
         <div class="loading-state" style="grid-column:1/-1;">
@@ -529,6 +524,73 @@
   </main>
 
   <div id="toast-container"></div>
+
+  <!-- Create Room Modal -->
+  <div id="create-room-modal" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:999; align-items:center; justify-content:center; padding:1rem;">
+    <div class="modal-content" style="background:white; border-radius:16px; width:100%; max-width:450px; padding:2rem; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-size:1.25rem; font-weight:700;">Create a Room</h2>
+        <button onclick="closeCreateRoomModal()" style="background:none; border:none; font-size:1.25rem; cursor:pointer;">✕</button>
+      </div>
+
+      <!-- Step 1: Name -->
+      <div id="room-step-1" class="room-step">
+        <label style="display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.875rem;">Step 1: Room Name</label>
+        <input type="text" id="room-name-input" placeholder="e.g. AI Startup, Hackathon Team" style="width:100%; padding:0.75rem 1rem; border:1px solid #ccc; border-radius:8px; margin-bottom:1.5rem; font-family:inherit;">
+        <button class="btn btn-primary" style="width:100%;" onclick="nextRoomStep(2)">Next: Choose Category</button>
+      </div>
+
+      <!-- Step 2: Category -->
+      <div id="room-step-2" class="room-step" style="display:none;">
+        <label style="display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.875rem;">Step 2: Category</label>
+        <select id="room-category-select" style="width:100%; padding:0.75rem 1rem; border:1px solid #ccc; border-radius:8px; margin-bottom:1.5rem; font-family:inherit; background:white;">
+          <option value="Hackathon">Hackathon</option>
+          <option value="Startup">Startup</option>
+          <option value="Side Project">Side Project</option>
+          <option value="College Project">College Project</option>
+          <option value="Open Source">Open Source</option>
+          <option value="Freelance">Freelance</option>
+          <option value="Research">Research</option>
+          <option value="Personal">Personal</option>
+          <option value="Other">Other</option>
+        </select>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-outline" style="flex:1;" onclick="nextRoomStep(1)">Back</button>
+          <button class="btn btn-primary" style="flex:2;" onclick="nextRoomStep(3)">Next: Select Members</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Members -->
+      <div id="room-step-3" class="room-step" style="display:none;">
+        <label style="display:block; font-weight:600; margin-bottom:0.5rem; font-size:0.875rem;">Step 3: Select Friends</label>
+        <input type="text" id="room-friend-search" placeholder="Search friends by name..." oninput="filterRoomFriends()" style="width:100%; padding:0.5rem; border:1px solid #eee; border-radius:6px; margin-bottom:1rem; font-size:0.8125rem;">
+        
+        <div id="room-friends-list" style="max-height:200px; overflow-y:auto; border:1px solid #eee; border-radius:8px; margin-bottom:1rem; padding:0.5rem;">
+          <!-- Populated by JS -->
+        </div>
+
+        <div style="font-size:0.75rem; color:#666; margin-bottom:1rem;">You will automatically be added as a member.</div>
+
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn btn-outline" style="flex:1;" onclick="nextRoomStep(2)">Back</button>
+          <button class="btn btn-primary" style="flex:2;" onclick="submitCreateRoom()" id="create-room-btn">Create Room</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Rooms Drawer -->
+  <div id="rooms-drawer" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:998; justify-content:flex-end;">
+    <div style="background:white; height:100%; width:100%; max-width:400px; padding:2rem; box-shadow:-5px 0 20px rgba(0,0,0,0.1); overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-size:1.25rem; font-weight:700;">All Rooms</h2>
+        <button onclick="closeRoomsDrawer()" style="background:none; border:none; font-size:1.25rem; cursor:pointer;">✕</button>
+      </div>
+      <div id="rooms-list-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
 
   <script src="js/dashboard.js"></script>
 </body>

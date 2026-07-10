@@ -57,19 +57,13 @@ function calculateMatchScore(me, them) {
   return { score, breakdown };
 }
 
-const MAX_CONNECTIONS = 3;
-
 // GET /api/match/top
 router.get('/top', auth, async (req, res) => {
   try {
     const me = await User.findById(req.user.id);
 
-    // Check if the current user has already hit their own limit
-    const myAcceptedCount = await Connection.countDocuments({
-      $or: [{ from: me._id }, { to: me._id }],
-      status: 'accepted'
-    });
-    const atLimit = myAcceptedCount >= MAX_CONNECTIONS;
+    // Limit removed; atLimit is always false now
+    const atLimit = false;
 
     // Get all connections for this user (any status) to exclude from discover
     const myConnections = await Connection.find({
@@ -79,20 +73,8 @@ router.get('/top', auth, async (req, res) => {
       c.from.toString() === me._id.toString() ? c.to.toString() : c.from.toString()
     );
 
-    // Find users who have already reached MAX accepted connections
-    // Using aggregation: count accepted connections per user, pick those >= MAX
-    const maxedOut = await Connection.aggregate([
-      { $match: { status: 'accepted' } },
-      { $project: { users: ['$from', '$to'] } },
-      { $unwind: '$users' },
-      { $group: { _id: '$users', count: { $sum: 1 } } },
-      { $match: { count: { $gte: MAX_CONNECTIONS } } },
-      { $project: { _id: 1 } }
-    ]);
-    const maxedOutIds = maxedOut.map(u => u._id.toString());
-
-    // Fetch potential matches — exclude connected, maxed-out, and self
-    const excludeIds = [...new Set([...connectedIds, ...maxedOutIds])];
+    // Fetch potential matches — exclude connected and self
+    const excludeIds = [...new Set([...connectedIds])];
 
     const others = await User.find({
       _id: { $ne: me._id, $nin: excludeIds },

@@ -48,13 +48,19 @@ let pendingRequests = [];
 async function loadMatches() {
   try {
     const data = await apiFetch('/api/match/top');
-    allMatches = data.matches || [];
-
-    // Show/hide the "at limit" banner
-    const banner = document.getElementById('limit-banner');
-    if (banner) banner.style.display = data.atLimit ? 'flex' : 'none';
-
-    renderMatches();
+    const matches = data.matches || [];
+    if (matches.length > 0) {
+        allMatches = matches;
+        renderMatches();
+      } else {
+        document.getElementById('matches-grid').innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <div class="empty-state-icon">🔍</div>
+            <h3>No matches found</h3>
+            <p>No other students found yet. Invite a friend to join StackMate!</p>
+          </div>
+        `;
+      }
   } catch (err) {
     document.getElementById('matches-grid').innerHTML = `
       <div class="empty-state" style="grid-column:1/-1;">
@@ -294,17 +300,14 @@ function renderMatches() {
   }
 
   if (!filtered.length) {
-    const isAtLimit = document.getElementById('limit-banner')?.style.display !== 'none';
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1;">
         <div class="empty-state-icon">🔍</div>
-        <h3>${isAtLimit ? 'No new connections available' : 'No matches found'}</h3>
+        <h3>No matches found</h3>
         <p>${
-          isAtLimit
-            ? 'You have 3 connections. Remove one to discover new partners.'
-            : activeFilter !== 'all'
-              ? 'No one strictly matches that criteria yet — try a different filter or check back later.'
-              : 'No other students found yet. Invite a friend to join StackMate!'
+          activeFilter !== 'all'
+            ? 'No one strictly matches that criteria yet — try a different filter or check back later.'
+            : 'No other students found yet. Invite a friend to join StackMate!'
         }</p>
       </div>`;
     return;
@@ -468,3 +471,123 @@ async function init() {
 }
 
 init();
+/* ── Rooms Feature ── */
+let roomFriends = [];
+
+function openCreateRoomModal() {
+  document.getElementById('create-room-modal').style.display = 'flex';
+  nextRoomStep(1);
+  document.getElementById('room-name-input').value = '';
+  loadRoomFriends();
+}
+function closeCreateRoomModal() {
+  document.getElementById('create-room-modal').style.display = 'none';
+}
+function nextRoomStep(step) {
+  document.querySelectorAll('.room-step').forEach(el => el.style.display = 'none');
+  document.getElementById('room-step-' + step).style.display = 'block';
+}
+
+async function loadRoomFriends() {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/connect/all', { headers: { 'Authorization': `Bearer ${token}` } });
+    const connections = await res.json();
+    roomFriends = connections.map(c => {
+      return c.from._id === currentUser._id ? c.to : c.from;
+    });
+    renderRoomFriends(roomFriends);
+  } catch (e) {
+    console.error('Error loading friends for room', e);
+  }
+}
+
+function renderRoomFriends(friends) {
+  const list = document.getElementById('room-friends-list');
+  if (friends.length === 0) {
+    list.innerHTML = '<div style="color:#666; font-size:0.875rem; text-align:center;">You have no friends yet to add to a room.</div>';
+    return;
+  }
+  list.innerHTML = friends.map(f => `
+    <label style="display:flex; align-items:center; gap:0.5rem; padding:0.5rem; cursor:pointer; border-radius:6px; transition:background 0.2s;" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background='transparent'">
+      <input type="checkbox" class="room-member-checkbox" value="${f._id}">
+      <div>
+        <div style="font-weight:600; font-size:0.875rem;">${f.name}</div>
+        <div style="font-size:0.75rem; color:#666;">${f.program || 'Student'}</div>
+      </div>
+    </label>
+  `).join('');
+}
+
+function filterRoomFriends() {
+  const query = document.getElementById('room-friend-search').value.toLowerCase();
+  const filtered = roomFriends.filter(f => f.name.toLowerCase().includes(query));
+  renderRoomFriends(filtered);
+}
+
+async function submitCreateRoom() {
+  const name = document.getElementById('room-name-input').value.trim();
+  const category = document.getElementById('room-category-select').value;
+  const memberCheckboxes = document.querySelectorAll('.room-member-checkbox:checked');
+  const members = Array.from(memberCheckboxes).map(cb => cb.value);
+
+  if (!name) return showToast('Room name is required', 'error');
+
+  const btn = document.getElementById('create-room-btn');
+  btn.innerText = 'Creating...';
+  btn.disabled = true;
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/rooms/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ name, category, members })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message);
+    
+    window.location.href = `room-chat.html?roomId=${data.room._id}`;
+  } catch (e) {
+    showToast(e.message, 'error');
+    btn.innerText = 'Create Room';
+    btn.disabled = false;
+  }
+}
+
+async function openRoomsDrawer() {
+  document.getElementById('rooms-drawer').style.display = 'flex';
+  const container = document.getElementById('rooms-list-container');
+  container.innerHTML = '<div class="spinner" style="margin:2rem auto;"></div>';
+  
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('/api/rooms', { headers: { 'Authorization': `Bearer ${token}` } });
+    const rooms = await res.json();
+    
+    if (rooms.length === 0) {
+      container.innerHTML = '<div style="color:#666;text-align:center;margin-top:2rem;">You are not in any rooms yet.</div>';
+      return;
+    }
+
+    container.innerHTML = rooms.map(r => `
+      <div onclick="window.location.href='room-chat.html?roomId=${r._id}'" style="display:block; padding:1rem; border:1px solid #eee; border-radius:12px; margin-bottom:1rem; cursor:pointer; transition:border-color 0.2s;" onmouseover="this.style.borderColor='#111'" onmouseout="this.style.borderColor='#eee'">
+        <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+          <div style="font-weight:700; font-size:1rem;">${r.name}</div>
+          <div style="font-size:0.75rem; background:#f3f4f6; padding:0.125rem 0.5rem; border-radius:12px;">${r.category}</div>
+        </div>
+        <div style="font-size:0.8125rem; color:#666; margin-bottom:0.5rem;">${r.members.length} members</div>
+        ${r.latestMessage ? `
+          <div style="font-size:0.8125rem; color:#333; background:#f9f9f9; padding:0.5rem; border-radius:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            <span style="font-weight:600;">${r.latestMessage.senderName}:</span> ${r.latestMessage.text}
+          </div>
+        ` : '<div style="font-size:0.8125rem; color:#999;">No messages yet</div>'}
+      </div>
+    `).join('');
+  } catch (e) {
+    container.innerHTML = '<div style="color:red;text-align:center;">Failed to load rooms.</div>';
+  }
+}
+function closeRoomsDrawer() {
+  document.getElementById('rooms-drawer').style.display = 'none';
+}

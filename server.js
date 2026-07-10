@@ -29,6 +29,10 @@ io.on('connection', (socket) => {
         text
       });
 
+      // Update Room lastActive if this connectionId is a Room ID
+      const Room = require('./models/Room');
+      await Room.findByIdAndUpdate(roomId, { lastActive: Date.now() }).catch(() => {});
+
       // Send to everyone in the room (both users see it instantly)
       io.to(roomId).emit('newMessage', {
         _id: message._id,
@@ -91,6 +95,7 @@ app.use('/api/profile', require('./routes/profile'));
 app.use('/api/connect', require('./routes/connect'));
 app.use('/api/chat',    require('./routes/chat'));
 app.use('/api/ai',      require('./routes/ai'));
+app.use('/api/rooms',   require('./routes/rooms'));
 
 // Fallback — serve 404 page for unknown routes
 app.get('*', (req, res) => {
