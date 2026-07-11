@@ -124,8 +124,9 @@ function setupSocket() {
     }
   });
 
-  socket.on('workspaceUserLeft', ({ socketId }) => {
-    workspaceUsers = workspaceUsers.filter(u => u.socketId !== socketId);
+  socket.on('workspaceUserLeft', ({ socketId, userId }) => {
+    // Filter by userId to guarantee all possible ghost sockets for this user are purged locally
+    workspaceUsers = workspaceUsers.filter(u => u.userId !== userId);
     renderWorkspaceAvatars();
   });
 
@@ -206,19 +207,36 @@ function updateZoneHighlight() {
 function renderWorkspaceAvatars() {
   const zones = ['research', 'development', 'presentation', 'lounge'];
   
+  // Deduplicate all workspaceUsers globally by userId
+  const uniqueUsersMap = new Map();
+  workspaceUsers.forEach(u => {
+    if (!uniqueUsersMap.has(u.userId)) {
+      uniqueUsersMap.set(u.userId, u);
+    } else {
+      const existing = uniqueUsersMap.get(u.userId);
+      // Prioritize our current socket, otherwise newest lastActive
+      if (u.socketId === socket.id) {
+        uniqueUsersMap.set(u.userId, u);
+      } else if (u.lastActive > existing.lastActive) {
+        uniqueUsersMap.set(u.userId, u);
+      }
+    }
+  });
+  const uniqueUsers = Array.from(uniqueUsersMap.values());
+  
   zones.forEach(zone => {
     const container = document.getElementById(`avatars-${zone}`);
     if (!container) return;
     
-    // Filter users in this zone
-    const usersInZone = workspaceUsers.filter(u => u.currentZone === zone);
+    // Filter deduplicated users for this zone
+    const usersInZone = uniqueUsers.filter(u => u.currentZone === zone);
     
     container.innerHTML = usersInZone.map(u => {
       // Find user data from roomData.members to get name
       const memberData = roomData.members.find(m => m._id === u.userId);
       const name = memberData ? memberData.name : 'Unknown';
       const initials = name.charAt(0).toUpperCase();
-      const isMe = u.socketId === socket.id;
+      const isMe = u.userId === currentUser._id;
       
       let indicatorClass = 'presence-indicator';
       if (u.presence === 'Away') indicatorClass += ' away';
@@ -251,6 +269,14 @@ function sendMessage() {
   input.value = '';
   input.focus();
 }
+
+// Ensure instant cleanup when the user leaves the page (Back button, refresh, close tab)
+window.addEventListener('beforeunload', () => {
+  if (socket) {
+    socket.emit('leaveWorkspace');
+    socket.disconnect();
+  }
+});
 
 // Members Drawer Toggle
 let isDrawerOpen = false;

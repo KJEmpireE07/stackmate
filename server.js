@@ -81,6 +81,16 @@ io.on('connection', (socket) => {
   // ── PHASE 0: Virtual Workspace Foundation ──
   socket.on('joinWorkspace', ({ roomId, userId }) => {
     socket.join(roomId);
+    
+    // Enforce 1 presence per user: purge any existing ghost sockets for this userId in this room
+    for (const [existingSocketId, existingState] of workspaceUsers.entries()) {
+      if (existingState.userId === userId && existingState.roomId === roomId) {
+        workspaceUsers.delete(existingSocketId);
+        // Tell clients to remove the old ghost socket
+        io.to(roomId).emit('workspaceUserLeft', { socketId: existingSocketId, userId });
+      }
+    }
+
     const state = {
       socketId: socket.id,
       roomId,
@@ -130,13 +140,21 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('leaveWorkspace', () => {
+    const state = workspaceUsers.get(socket.id);
+    if (state) {
+      io.to(state.roomId).emit('workspaceUserLeft', { socketId: socket.id, userId: state.userId });
+      workspaceUsers.delete(socket.id);
+    }
+  });
+
   socket.on('disconnect', () => {
     // Notify all rooms this socket was in
     socket.rooms.forEach(room => {
       socket.to(room).emit('partnerLeft');
     });
 
-    // Workspace disconnect logic
+    // Workspace disconnect logic fallback
     const state = workspaceUsers.get(socket.id);
     if (state) {
       io.to(state.roomId).emit('workspaceUserLeft', { socketId: socket.id, userId: state.userId });
