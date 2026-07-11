@@ -9,6 +9,10 @@ let socket;
 let currentUser = null;
 let roomData = null;
 
+// Workspace State
+let workspaceUsers = [];
+let currentZone = 'lounge';
+
 // Helper: Show toast notification
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
@@ -89,6 +93,41 @@ function setupSocket() {
   socket = io({ auth: { token: localStorage.getItem('sm_token') } });
   
   socket.emit('joinRoom', roomId);
+  socket.emit('joinWorkspace', { roomId, userId: currentUser._id });
+
+  // Workspace Socket Events
+  socket.on('workspaceState', (users) => {
+    workspaceUsers = users;
+    // Add current user to local state
+    workspaceUsers.push({
+      socketId: socket.id,
+      userId: currentUser._id,
+      currentZone: currentZone,
+      presence: 'Online'
+    });
+    renderWorkspaceAvatars();
+    updateZoneHighlight();
+  });
+
+  socket.on('workspaceUserJoined', (state) => {
+    if (state.socketId !== socket.id) {
+      workspaceUsers.push(state);
+      renderWorkspaceAvatars();
+    }
+  });
+
+  socket.on('workspaceUserUpdated', (state) => {
+    const idx = workspaceUsers.findIndex(u => u.socketId === state.socketId);
+    if (idx !== -1) {
+      workspaceUsers[idx] = state;
+      renderWorkspaceAvatars();
+    }
+  });
+
+  socket.on('workspaceUserLeft', ({ socketId }) => {
+    workspaceUsers = workspaceUsers.filter(u => u.socketId !== socketId);
+    renderWorkspaceAvatars();
+  });
 
   socket.on('newMessage', (msg) => {
     // Remove "Start the conversation" text if present
@@ -135,11 +174,68 @@ function scrollToBottom() {
   container.scrollTop = container.scrollHeight;
 }
 
-// Sending Messages
+// Event Listeners
 document.getElementById('send-btn').addEventListener('click', sendMessage);
 document.getElementById('message-input').addEventListener('keypress', (e) => {
   if (e.key === 'Enter') sendMessage();
 });
+
+// Init
+init();
+
+/* ── Workspace Logic ── */
+
+function joinZone(zoneId) {
+  currentZone = zoneId;
+  socket.emit('updateZone', { zone: zoneId });
+  
+  // Update local state
+  const myState = workspaceUsers.find(u => u.socketId === socket.id);
+  if (myState) myState.currentZone = zoneId;
+  
+  renderWorkspaceAvatars();
+  updateZoneHighlight();
+}
+
+function updateZoneHighlight() {
+  document.querySelectorAll('.zone-card').forEach(card => card.classList.remove('active-zone'));
+  const activeCard = document.getElementById(`zone-${currentZone}`);
+  if (activeCard) activeCard.classList.add('active-zone');
+}
+
+function renderWorkspaceAvatars() {
+  const zones = ['research', 'development', 'presentation', 'lounge'];
+  
+  zones.forEach(zone => {
+    const container = document.getElementById(`avatars-${zone}`);
+    if (!container) return;
+    
+    // Filter users in this zone
+    const usersInZone = workspaceUsers.filter(u => u.currentZone === zone);
+    
+    container.innerHTML = usersInZone.map(u => {
+      // Find user data from roomData.members to get name
+      const memberData = roomData.members.find(m => m._id === u.userId);
+      const name = memberData ? memberData.name : 'Unknown';
+      const initials = name.charAt(0).toUpperCase();
+      const isMe = u.socketId === socket.id;
+      
+      let indicatorClass = 'presence-indicator';
+      if (u.presence === 'Away') indicatorClass += ' away';
+      if (u.presence === 'Busy') indicatorClass += ' busy';
+      
+      return `
+        <div class="workspace-avatar" title="${name}">
+          <div class="avatar-circle">
+            ${initials}
+            <div class="${indicatorClass}"></div>
+          </div>
+          <div class="avatar-name">${isMe ? 'You' : name.split(' ')[0]}</div>
+        </div>
+      `;
+    }).join('');
+  });
+}
 
 function sendMessage() {
   const input = document.getElementById('message-input');

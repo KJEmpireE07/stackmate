@@ -61,6 +61,16 @@ function renderProfile() {
   document.getElementById('p-name').textContent = u.name;
   document.getElementById('p-role').textContent = (u.role === 'student' ? '🎓 Student' : '💼 Professional') + (u.program ? ` • ${u.program}` : '');
   document.getElementById('p-bio').textContent = u.bio || 'No bio yet. Click Edit Profile to add one.';
+  
+  const githubVal = document.getElementById('p-github');
+  if (githubVal) {
+    if (u.github) {
+      githubVal.textContent = u.github;
+    } else {
+      githubVal.textContent = '—';
+    }
+  }
+
   document.getElementById('p-program').textContent = u.program || '—';
   document.getElementById('p-year').textContent = yearLabels[u.year] || '—';
   document.getElementById('p-university').textContent = u.university || '—';

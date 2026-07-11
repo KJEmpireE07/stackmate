@@ -12,6 +12,10 @@ const io = new Server(server);          // attach Socket.io to that server
 
 const Message = require('./models/Message');
 
+// Phase 0: Workspace Data Foundation
+// Maps socket.id to user's workspace state
+const workspaceUsers = new Map();
+
 io.on('connection', (socket) => {
 
   // User joins a chat room (room = connectionId between two partners)
@@ -74,11 +78,70 @@ io.on('connection', (socket) => {
     socket.to(roomId).emit('partnerStatus', { status });
   });
 
+  // ── PHASE 0: Virtual Workspace Foundation ──
+  socket.on('joinWorkspace', ({ roomId, userId }) => {
+    socket.join(roomId);
+    const state = {
+      socketId: socket.id,
+      roomId,
+      userId,
+      currentZone: 'lounge', // default zone
+      presence: 'Online',
+      cameraEnabled: false,
+      micEnabled: false,
+      joinedAt: Date.now(),
+      lastActive: Date.now()
+    };
+    workspaceUsers.set(socket.id, state);
+    
+    // Broadcast to room that a new user joined the workspace
+    socket.to(roomId).emit('workspaceUserJoined', state);
+
+    // Send all current users in the room to the joining user
+    const roomUsers = Array.from(workspaceUsers.values()).filter(u => u.roomId === roomId && u.socketId !== socket.id);
+    socket.emit('workspaceState', roomUsers);
+  });
+
+  socket.on('updateZone', ({ zone }) => {
+    const state = workspaceUsers.get(socket.id);
+    if (state) {
+      state.currentZone = zone;
+      state.lastActive = Date.now();
+      io.to(state.roomId).emit('workspaceUserUpdated', state);
+    }
+  });
+
+  socket.on('updatePresence', ({ presence }) => {
+    const state = workspaceUsers.get(socket.id);
+    if (state) {
+      state.presence = presence;
+      state.lastActive = Date.now();
+      io.to(state.roomId).emit('workspaceUserUpdated', state);
+    }
+  });
+
+  socket.on('updateMedia', ({ cameraEnabled, micEnabled }) => {
+    const state = workspaceUsers.get(socket.id);
+    if (state) {
+      if (cameraEnabled !== undefined) state.cameraEnabled = cameraEnabled;
+      if (micEnabled !== undefined) state.micEnabled = micEnabled;
+      state.lastActive = Date.now();
+      io.to(state.roomId).emit('workspaceUserUpdated', state);
+    }
+  });
+
   socket.on('disconnect', () => {
     // Notify all rooms this socket was in
     socket.rooms.forEach(room => {
       socket.to(room).emit('partnerLeft');
     });
+
+    // Workspace disconnect logic
+    const state = workspaceUsers.get(socket.id);
+    if (state) {
+      io.to(state.roomId).emit('workspaceUserLeft', { socketId: socket.id, userId: state.userId });
+      workspaceUsers.delete(socket.id);
+    }
   });
 
 });

@@ -6,6 +6,7 @@
   <title>Room Chat — StackMate</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/workspace.css">
   <style>
     body {
       background: #fafafa;
@@ -206,19 +207,62 @@
     <button class="members-btn" onclick="toggleMembersDrawer()">Members</button>
   </header>
 
-  <!-- Chat Area -->
-  <main class="chat-container" id="chat-container">
-    <div style="text-align:center; color:#999; font-size:0.875rem; margin-top:2rem;">
-      <div class="spinner" id="chat-spinner" style="margin: 0 auto 1rem;"></div>
-      Loading messages...
-    </div>
-  </main>
+  <!-- Workspace Content -->
+  <div class="workspace-container">
+    
+    <!-- Left Panel: 4 Zones -->
+    <div class="zones-layout" id="zones-layout">
+      
+      <!-- Research Lab -->
+      <div class="zone-card" id="zone-research" onclick="joinZone('research')">
+        <div class="zone-header">
+          <div class="zone-title">🔬 Research Lab</div>
+        </div>
+        <div class="zone-avatars-area" id="avatars-research"></div>
+      </div>
+      
+      <!-- Development Room -->
+      <div class="zone-card" id="zone-development" onclick="joinZone('development')">
+        <div class="zone-header">
+          <div class="zone-title">💻 Development Room</div>
+        </div>
+        <div class="zone-avatars-area" id="avatars-development"></div>
+      </div>
+      
+      <!-- Presentation Room -->
+      <div class="zone-card" id="zone-presentation" onclick="joinZone('presentation')">
+        <div class="zone-header">
+          <div class="zone-title">📊 Presentation Room</div>
+        </div>
+        <div class="zone-avatars-area" id="avatars-presentation"></div>
+      </div>
+      
+      <!-- Lounge -->
+      <div class="zone-card" id="zone-lounge" onclick="joinZone('lounge')">
+        <div class="zone-header">
+          <div class="zone-title">☕ Lounge</div>
+        </div>
+        <div class="zone-avatars-area" id="avatars-lounge"></div>
+      </div>
 
-  <!-- Input Area -->
-  <footer class="chat-input-area">
-    <input type="text" id="message-input" class="chat-input" placeholder="Type a message..." autocomplete="off">
-    <button class="send-btn" id="send-btn">➤</button>
-  </footer>
+    </div>
+
+    <!-- Right Panel: Global Chat -->
+    <aside class="global-chat-sidebar">
+      <main class="chat-container" id="chat-container">
+        <div style="text-align:center; color:#999; font-size:0.875rem; margin-top:2rem;">
+          <div class="spinner" id="chat-spinner" style="margin: 0 auto 1rem;"></div>
+          Loading messages...
+        </div>
+      </main>
+
+      <footer class="chat-input-area">
+        <input type="text" id="message-input" class="chat-input" placeholder="Type a message..." autocomplete="off">
+        <button class="send-btn" id="send-btn">➤</button>
+      </footer>
+    </aside>
+    
+  </div>
 
   <!-- Members Drawer -->
   <div id="members-drawer">
