@@ -81,6 +81,9 @@ async function init() {
     }
     scrollToBottom();
 
+    // Setup Workspace Engine
+    setupWorkspaceFloor();
+
     // Setup Socket
     setupSocket();
   } catch (err) {
@@ -120,6 +123,23 @@ function setupSocket() {
     const idx = workspaceUsers.findIndex(u => u.socketId === state.socketId);
     if (idx !== -1) {
       workspaceUsers[idx] = state;
+      renderWorkspaceAvatars();
+    }
+  });
+
+  socket.on('workspaceUserMoved', (payload) => {
+    // payload: { socketId, userId, x, y, currentZone }
+    const user = workspaceUsers.find(u => u.userId === payload.userId);
+    if (user && user.socketId !== socket.id) {
+      user.x = payload.x;
+      user.y = payload.y;
+      user.currentZone = payload.currentZone;
+      
+      // We don't re-render the whole array for movement to avoid destroying CSS transitions.
+      // Instead, we just find the DOM element and update its inline style directly!
+      // To do this, we need to map avatars to userIds. But wait, renderWorkspaceAvatars rewrites innerHTML.
+      // For now, renderWorkspaceAvatars is fast enough, but CSS transitions require the element to persist.
+      // If we re-render innerHTML, CSS transitions break.
       renderWorkspaceAvatars();
     }
   });
@@ -184,28 +204,79 @@ document.getElementById('message-input').addEventListener('keypress', (e) => {
 // Init
 init();
 
-/* ── Workspace Logic ── */
+/* ── Spatial 2D Workspace Logic ── */
 
-function joinZone(zoneId) {
-  currentZone = zoneId;
-  socket.emit('updateZone', { zone: zoneId });
+function setupWorkspaceFloor() {
+  const floor = document.getElementById('office-floor');
+  if (!floor) return;
+  
+  floor.addEventListener('click', (e) => {
+    // Ensure we don't trigger if they clicked an interactive piece of furniture or another avatar
+    if (e.target.closest('.furniture') || e.target.closest('.workspace-avatar')) {
+      // For now, let clicks pass through to floor, or handle object interaction later
+    }
+    
+    const rect = floor.getBoundingClientRect();
+    let x = (e.clientX - rect.left) / rect.width;
+    let y = (e.clientY - rect.top) / rect.height;
+    
+    // Clamp coordinates to stay within the floor
+    x = Math.max(0.02, Math.min(0.98, x));
+    y = Math.max(0.02, Math.min(0.98, y));
+    
+    walkTo(x, y);
+  });
+}
+
+function walkTo(x, y) {
+  // Determine zone from coords
+  const newZone = getZoneFromCoords(x, y);
+  
+  if (newZone !== currentZone) {
+    currentZone = newZone;
+    socket.emit('updateZone', { zone: newZone });
+    showZoneNotification(newZone);
+  }
+  
+  socket.emit('updatePosition', { x, y });
   
   // Update local state
   const myState = workspaceUsers.find(u => u.socketId === socket.id);
-  if (myState) myState.currentZone = zoneId;
+  if (myState) {
+    myState.x = x;
+    myState.y = y;
+    myState.currentZone = newZone;
+  }
   
   renderWorkspaceAvatars();
-  updateZoneHighlight();
 }
 
-function updateZoneHighlight() {
-  document.querySelectorAll('.zone-card').forEach(card => card.classList.remove('active-zone'));
-  const activeCard = document.getElementById(`zone-${currentZone}`);
-  if (activeCard) activeCard.classList.add('active-zone');
+function getZoneFromCoords(x, y) {
+  if (x < 0.5 && y < 0.5) return 'research';
+  if (x >= 0.5 && y < 0.5) return 'development';
+  if (x < 0.5 && y >= 0.5) return 'presentation';
+  return 'lounge';
+}
+
+function showZoneNotification(zone) {
+  const notif = document.getElementById('zone-notification');
+  if (!notif) return;
+  
+  const titles = {
+    'research': 'Joined Audio: Research Lab',
+    'development': 'Joined Audio: Development Area',
+    'presentation': 'Joined Audio: Presentation Stage',
+    'lounge': 'Joined Audio: The Lounge'
+  };
+  
+  notif.innerText = titles[zone] || 'Joined Audio Zone';
+  notif.classList.add('show');
+  setTimeout(() => notif.classList.remove('show'), 3000);
 }
 
 function renderWorkspaceAvatars() {
-  const zones = ['research', 'development', 'presentation', 'lounge'];
+  const container = document.getElementById('avatars-layer');
+  if (!container) return;
   
   // Deduplicate all workspaceUsers globally by userId
   const uniqueUsersMap = new Map();
@@ -214,7 +285,6 @@ function renderWorkspaceAvatars() {
       uniqueUsersMap.set(u.userId, u);
     } else {
       const existing = uniqueUsersMap.get(u.userId);
-      // Prioritize our current socket, otherwise newest lastActive
       if (u.socketId === socket.id) {
         uniqueUsersMap.set(u.userId, u);
       } else if (u.lastActive > existing.lastActive) {
@@ -222,17 +292,25 @@ function renderWorkspaceAvatars() {
       }
     }
   });
+  
   const uniqueUsers = Array.from(uniqueUsersMap.values());
   
-  zones.forEach(zone => {
-    const container = document.getElementById(`avatars-${zone}`);
-    if (!container) return;
+  // Keep track of which avatars we processed to remove stale ones
+  const processedUserIds = new Set();
+  
+  uniqueUsers.forEach(u => {
+    processedUserIds.add(u.userId);
+    let avatarEl = document.getElementById(`avatar-${u.userId}`);
     
-    // Filter deduplicated users for this zone
-    const usersInZone = uniqueUsers.filter(u => u.currentZone === zone);
+    const leftPercent = (u.x !== undefined ? u.x : 0.5) * 100;
+    const topPercent = (u.y !== undefined ? u.y : 0.5) * 100;
     
-    container.innerHTML = usersInZone.map(u => {
-      // Find user data from roomData.members to get name
+    if (!avatarEl) {
+      // Create new avatar DOM element
+      avatarEl = document.createElement('div');
+      avatarEl.id = `avatar-${u.userId}`;
+      avatarEl.className = 'workspace-avatar';
+      
       const memberData = roomData.members.find(m => m._id === u.userId);
       const name = memberData ? memberData.name : 'Unknown';
       const initials = name.charAt(0).toUpperCase();
@@ -242,16 +320,40 @@ function renderWorkspaceAvatars() {
       if (u.presence === 'Away') indicatorClass += ' away';
       if (u.presence === 'Busy') indicatorClass += ' busy';
       
-      return `
-        <div class="workspace-avatar" title="${name}">
-          <div class="avatar-circle">
+      avatarEl.title = name;
+      avatarEl.innerHTML = `
+        <div class="avatar-transform-wrapper">
+          <div class="avatar-circle ${isMe ? 'is-me' : ''}">
             ${initials}
-            <div class="${indicatorClass}"></div>
+            <div id="presence-${u.userId}" class="${indicatorClass}"></div>
           </div>
           <div class="avatar-name">${isMe ? 'You' : name.split(' ')[0]}</div>
         </div>
       `;
-    }).join('');
+      container.appendChild(avatarEl);
+    } else {
+      // Update existing DOM element presence
+      const indicatorClass = 'presence-indicator' + (u.presence === 'Away' ? ' away' : (u.presence === 'Busy' ? ' busy' : ''));
+      const indicatorEl = document.getElementById(`presence-${u.userId}`);
+      if (indicatorEl) indicatorEl.className = indicatorClass;
+    }
+    
+    // Update coordinates using transform for smooth CSS transitions
+    // Since workspace-avatar is position absolute, we can just update left/top. 
+    // Wait, transition on left/top is expensive. We can just use left/top in the CSS and let it transition, 
+    // or set left/top to 0 and use transform: translate(x, y). 
+    // Since our CSS uses left/top for positioning and has `transition: left 0.6s, top 0.6s` (I should update CSS if I didn't). 
+    // Let's just update left and top inline. 
+    avatarEl.style.left = `${leftPercent}%`;
+    avatarEl.style.top = `${topPercent}%`;
+  });
+  
+  // Remove stale avatars
+  Array.from(container.children).forEach(child => {
+    const userId = child.id.replace('avatar-', '');
+    if (!processedUserIds.has(userId)) {
+      child.remove();
+    }
   });
 }
 

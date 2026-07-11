@@ -96,6 +96,8 @@ io.on('connection', (socket) => {
       roomId,
       userId,
       currentZone: 'lounge', // default zone
+      x: 0.5, // 50% width
+      y: 0.5, // 50% height
       presence: 'Online',
       cameraEnabled: false,
       micEnabled: false,
@@ -118,6 +120,17 @@ io.on('connection', (socket) => {
       state.currentZone = zone;
       state.lastActive = Date.now();
       io.to(state.roomId).emit('workspaceUserUpdated', state);
+    }
+  });
+
+  socket.on('updatePosition', ({ x, y }) => {
+    const state = workspaceUsers.get(socket.id);
+    if (state) {
+      state.x = x;
+      state.y = y;
+      state.lastActive = Date.now();
+      // Broadcast position instantly to room (using volatile if necessary, but standard emit is fine for now)
+      io.to(state.roomId).emit('workspaceUserMoved', { socketId: socket.id, userId: state.userId, x, y, currentZone: state.currentZone });
     }
   });
 

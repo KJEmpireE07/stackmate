@@ -210,41 +210,40 @@
   <!-- Workspace Content -->
   <div class="workspace-container">
     
-    <!-- Left Panel: 4 Zones -->
-    <div class="zones-layout" id="zones-layout">
-      
-      <!-- Research Lab -->
-      <div class="zone-card" id="zone-research" onclick="joinZone('research')">
-        <div class="zone-header">
-          <div class="zone-title">🔬 Research Lab</div>
+    <!-- Left Panel: Spatial 2D Floor Plan -->
+    <div class="office-floor-wrapper" id="floor-wrapper">
+      <div class="office-floor" id="office-floor">
+        
+        <!-- Architectural Zones (Background Visuals) -->
+        <div class="arch-zone arch-research" id="zone-bg-research">
+          <div class="arch-zone-title">Research Lab</div>
         </div>
-        <div class="zone-avatars-area" id="avatars-research"></div>
-      </div>
-      
-      <!-- Development Room -->
-      <div class="zone-card" id="zone-development" onclick="joinZone('development')">
-        <div class="zone-header">
-          <div class="zone-title">💻 Development Room</div>
+        
+        <div class="arch-zone arch-development" id="zone-bg-development">
+          <div class="arch-zone-title">Development Area</div>
         </div>
-        <div class="zone-avatars-area" id="avatars-development"></div>
-      </div>
-      
-      <!-- Presentation Room -->
-      <div class="zone-card" id="zone-presentation" onclick="joinZone('presentation')">
-        <div class="zone-header">
-          <div class="zone-title">📊 Presentation Room</div>
+        
+        <div class="arch-zone arch-presentation" id="zone-bg-presentation">
+          <div class="arch-zone-title" style="text-align: right;">Presentation Stage</div>
         </div>
-        <div class="zone-avatars-area" id="avatars-presentation"></div>
-      </div>
-      
-      <!-- Lounge -->
-      <div class="zone-card" id="zone-lounge" onclick="joinZone('lounge')">
-        <div class="zone-header">
-          <div class="zone-title">☕ Lounge</div>
+        
+        <div class="arch-zone arch-lounge" id="zone-bg-lounge">
+          <div class="arch-zone-title" style="text-align: right;">The Lounge</div>
         </div>
-        <div class="zone-avatars-area" id="avatars-lounge"></div>
-      </div>
 
+        <!-- Furniture Placeholders -->
+        <div class="furniture f-desk" style="top: 15%; right: 15%; width: 250px; height: 100px;">Coding Desk</div>
+        <div class="furniture f-board" style="top: 15%; left: 10%; width: 150px; height: 20px;">Knowledge Shelf</div>
+        <div class="furniture f-couch" style="bottom: 15%; right: 15%; width: 200px; height: 80px;">Sofa</div>
+        <div class="furniture f-plant" style="bottom: 20%; right: 35%;"></div>
+
+        <!-- Avatars will be dynamically injected here via JS -->
+        <div id="avatars-layer"></div>
+
+      </div>
+      
+      <!-- Pop-up notification when entering a new audio zone -->
+      <div id="zone-notification" class="zone-notification"></div>
     </div>
 
     <!-- Right Panel: Global Chat -->
