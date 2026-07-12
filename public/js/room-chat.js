@@ -127,6 +127,15 @@ function setupSocket() {
     if (idx !== -1) {
       workspaceUsers[idx] = state;
       renderWorkspaceAvatars();
+      
+      // Update remote video visibility based on their camera state
+      const avatarCircle = document.querySelector(`#avatar-${state.userId} .avatar-circle`);
+      if (avatarCircle) {
+        const videoEl = avatarCircle.querySelector('video');
+        if (videoEl) {
+          videoEl.style.display = state.cameraEnabled ? 'block' : 'none';
+        }
+      }
     }
   });
 
@@ -149,8 +158,9 @@ function setupSocket() {
   });
 
   socket.on('workspaceUserLeft', ({ socketId, userId }) => {
-    // Filter by userId to guarantee all possible ghost sockets for this user are purged locally
-    workspaceUsers = workspaceUsers.filter(u => u.userId !== userId);
+    // We now filter by socketId instead of userId. 
+    // The backend guarantees 1 socket per user, so purging by socketId safely removes ghosts without deleting valid reconnects if events arrive out of order.
+    workspaceUsers = workspaceUsers.filter(u => u.socketId !== socketId);
     renderWorkspaceAvatars();
   });
 
