@@ -507,8 +507,11 @@ function interactWithObject(obj) {
     panel.classList.add('open');
   }
   else if (type === 'presentation') {
-    // Screen share placeholder
-    alert('Launching WebRTC Screen Share! (To be implemented in a dedicated screen share module)');
+    if (typeof startScreenShare === 'function') {
+      startScreenShare();
+    } else {
+      alert('Screen sharing module is not loaded yet.');
+    }
   }
   else if (type === 'docs') {
     window.open('https://docs.google.com', '_blank'); // Example of external launcher

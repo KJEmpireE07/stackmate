@@ -177,6 +177,18 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('screenShareState', (payload) => {
+    // payload: { active, streamId }
+    const state = workspaceUsers.get(socket.id);
+    if (state) {
+      socket.to(state.roomId).emit('screenShareState', {
+        socketId: socket.id,
+        active: payload.active,
+        streamId: payload.streamId
+      });
+    }
+  });
+
   socket.on('leaveWorkspace', () => {
     const state = workspaceUsers.get(socket.id);
     if (state) {

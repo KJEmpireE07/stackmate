@@ -80,8 +80,18 @@ function createPeerConnection(targetSocketId) {
   };
 
   pc.ontrack = (event) => {
-    // When a remote track is received, attach it to their avatar
-    attachMediaToAvatar(targetSocketId, event.streams[0]);
+    const stream = event.streams[0];
+    // Check if this stream is the active screen share
+    if (activeScreenStreamId && stream.id === activeScreenStreamId) {
+      const video = document.getElementById('screen-share-video');
+      if (video.srcObject !== stream) {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => video.play().catch(e => console.warn(e));
+      }
+    } else {
+      // Otherwise, it's a regular camera/mic track, attach it to their avatar
+      attachMediaToAvatar(targetSocketId, stream);
+    }
   };
 
   if (localStream) {
@@ -165,6 +175,94 @@ socket.on('workspaceUserLeft', ({ socketId }) => {
     delete peers[socketId];
   }
 });
+
+// Global to track active screen share stream id
+let activeScreenStreamId = null;
+let screenStream = null;
+let screenTrackSenderMap = {}; // socketId -> RTCRtpSender
+
+socket.on('screenShareState', ({ active, socketId, streamId }) => {
+  const modal = document.getElementById('screen-share-modal');
+  const video = document.getElementById('screen-share-video');
+  const controls = document.getElementById('screen-share-controls');
+  
+  if (active) {
+    activeScreenStreamId = streamId;
+    modal.classList.add('open');
+    controls.style.display = 'none'; // Remote users can't stop it
+    
+    // Auto-close object panel if it's open to give full view
+    document.getElementById('object-panel').classList.remove('open');
+  } else {
+    activeScreenStreamId = null;
+    modal.classList.remove('open');
+    if (video.srcObject) {
+      video.srcObject = null;
+    }
+  }
+});
+
+async function startScreenShare() {
+  try {
+    screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+    const track = screenStream.getVideoTracks()[0];
+    
+    track.onended = () => {
+      stopScreenShare();
+    };
+
+    // Add track to all peers
+    for (const socketId in peers) {
+      const pc = peers[socketId];
+      const sender = pc.addTrack(track, screenStream);
+      screenTrackSenderMap[socketId] = sender;
+    }
+    
+    // Attach to local modal
+    const modal = document.getElementById('screen-share-modal');
+    const video = document.getElementById('screen-share-video');
+    const controls = document.getElementById('screen-share-controls');
+    
+    video.srcObject = screenStream;
+    video.onloadedmetadata = () => video.play().catch(e => console.warn(e));
+    
+    modal.classList.add('open');
+    controls.style.display = 'flex';
+    
+    socket.emit('screenShareState', { active: true, streamId: screenStream.id });
+    
+  } catch (err) {
+    console.error('Error sharing screen:', err);
+  }
+}
+
+function stopScreenShare() {
+  if (screenStream) {
+    screenStream.getTracks().forEach(t => t.stop());
+    screenStream = null;
+  }
+  
+  // Remove from peers
+  for (const socketId in peers) {
+    const pc = peers[socketId];
+    const sender = screenTrackSenderMap[socketId];
+    if (sender) {
+      pc.removeTrack(sender);
+    }
+  }
+  screenTrackSenderMap = {};
+  
+  const modal = document.getElementById('screen-share-modal');
+  const video = document.getElementById('screen-share-video');
+  modal.classList.remove('open');
+  if (video.srcObject) video.srcObject = null;
+  
+  socket.emit('screenShareState', { active: false });
+}
+
+function closeScreenShareModal() {
+  document.getElementById('screen-share-modal').classList.remove('open');
+}
 
 // ── DOM Helper ──
 
