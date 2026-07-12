@@ -28,8 +28,7 @@ async function toggleLocalMedia(type) {
         localStream.getTracks().forEach(track => {
           peers[socketId].addTrack(track, localStream);
         });
-        // Renegotiate offer
-        makeCall(socketId);
+        // Negotiation will automatically be triggered by pc.onnegotiationneeded
       }
       
       // Setup local video preview (if we want one, or just attach to our own avatar)
@@ -74,6 +73,10 @@ function createPeerConnection(targetSocketId) {
         candidate: event.candidate
       });
     }
+  };
+
+  pc.onnegotiationneeded = () => {
+    makeCall(targetSocketId);
   };
 
   pc.ontrack = (event) => {
@@ -211,6 +214,11 @@ function attachMediaToAvatar(socketId, stream) {
 
   if (videoEl.srcObject !== stream) {
     videoEl.srcObject = stream;
+    
+    // Explicitly call play to handle browsers that require it for WebRTC streams
+    videoEl.onloadedmetadata = () => {
+      videoEl.play().catch(e => console.warn('Autoplay prevented:', e));
+    };
   }
   
   // Also update visibility based on state
