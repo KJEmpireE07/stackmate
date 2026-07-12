@@ -109,7 +109,10 @@ function setupSocket() {
       presence: 'Online'
     });
     renderWorkspaceAvatars();
-    updateZoneHighlight();
+    // Initiate WebRTC mesh connections to everyone currently in the room
+    if (typeof initiateCallsToAll === 'function') {
+      initiateCallsToAll(workspaceUsers);
+    }
   });
 
   socket.on('workspaceUserJoined', (state) => {
@@ -141,6 +144,7 @@ function setupSocket() {
       // For now, renderWorkspaceAvatars is fast enough, but CSS transitions require the element to persist.
       // If we re-render innerHTML, CSS transitions break.
       renderWorkspaceAvatars();
+      if (typeof applyProximityAudio === 'function') applyProximityAudio();
     }
   });
 
@@ -236,6 +240,9 @@ function walkTo(x, y) {
     currentZone = newZone;
     socket.emit('updateZone', { zone: newZone });
     showZoneNotification(newZone);
+    
+    // Update proximity audio for new zone
+    if (typeof applyProximityAudio === 'function') applyProximityAudio();
   }
   
   socket.emit('updatePosition', { x, y });
@@ -370,6 +377,31 @@ function sendMessage() {
 
   input.value = '';
   input.focus();
+}
+
+/* ── Media Controls ── */
+async function handleMicToggle() {
+  const btn = document.getElementById('btn-toggle-mic');
+  const isEnabled = await toggleLocalMedia('audio');
+  if (isEnabled) {
+    btn.classList.add('active');
+    btn.innerHTML = '<span class="icon">🎤</span> Mute';
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '<span class="icon">🎤</span> Unmute';
+  }
+}
+
+async function handleCameraToggle() {
+  const btn = document.getElementById('btn-toggle-camera');
+  const isEnabled = await toggleLocalMedia('video');
+  if (isEnabled) {
+    btn.classList.add('active');
+    btn.innerHTML = '<span class="icon">📷</span> Turn off Camera';
+  } else {
+    btn.classList.remove('active');
+    btn.innerHTML = '<span class="icon">📷</span> Turn on Camera';
+  }
 }
 
 // Ensure instant cleanup when the user leaves the page (Back button, refresh, close tab)

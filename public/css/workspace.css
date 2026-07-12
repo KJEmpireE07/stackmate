@@ -301,3 +301,42 @@
 @media (max-width: 900px) {
   .global-chat-sidebar { display: none; }
 }
+
+/* ── Media Controls (Bottom Bar) ── */
+.media-controls {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 24px;
+  border-radius: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.05);
+  backdrop-filter: blur(10px);
+  z-index: 500;
+}
+.btn-media {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-media:hover {
+  background: #e5e7eb;
+}
+.btn-media.active {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #047857;
+}

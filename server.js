@@ -153,6 +153,30 @@ io.on('connection', (socket) => {
     }
   });
 
+  // ── PHASE 2: WebRTC Signaling ──
+  socket.on('webrtc-offer', (payload) => {
+    // payload: { targetSocketId, sdp, callerSocketId }
+    socket.to(payload.targetSocketId).emit('webrtc-offer', {
+      callerSocketId: socket.id,
+      sdp: payload.sdp
+    });
+  });
+
+  socket.on('webrtc-answer', (payload) => {
+    // payload: { targetSocketId, sdp, callerSocketId }
+    socket.to(payload.targetSocketId).emit('webrtc-answer', {
+      callerSocketId: socket.id,
+      sdp: payload.sdp
+    });
+  });
+
+  socket.on('webrtc-ice-candidate', (payload) => {
+    socket.to(payload.targetSocketId).emit('webrtc-ice-candidate', {
+      callerSocketId: socket.id,
+      candidate: payload.candidate
+    });
+  });
+
   socket.on('leaveWorkspace', () => {
     const state = workspaceUsers.get(socket.id);
     if (state) {

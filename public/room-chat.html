@@ -245,6 +245,16 @@
       
       <!-- Pop-up notification when entering a new audio zone -->
       <div id="zone-notification" class="zone-notification"></div>
+
+      <!-- Media Controls (Bottom Center) -->
+      <div class="media-controls">
+        <button id="btn-toggle-mic" class="btn-media" onclick="handleMicToggle()">
+          <span class="icon">🎤</span> Unmute
+        </button>
+        <button id="btn-toggle-camera" class="btn-media" onclick="handleCameraToggle()">
+          <span class="icon">📷</span> Turn on Camera
+        </button>
+      </div>
     </div>
 
     <!-- Right Panel: Global Chat -->
@@ -278,6 +288,7 @@
   <div id="toast-container"></div>
   
   <script src="/socket.io/socket.io.js"></script>
-  <script src="js/room-chat.js"></script>
+  <script src="/js/webrtc.js"></script>
+  <script src="/js/room-chat.js"></script>
 </body>
 </html>
