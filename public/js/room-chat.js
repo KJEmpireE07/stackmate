@@ -246,6 +246,7 @@ function walkTo(x, y) {
   }
   
   socket.emit('updatePosition', { x, y });
+  checkObjectProximity(x, y);
   
   // Update local state
   const myState = workspaceUsers.find(u => u.socketId === socket.id);
@@ -404,13 +405,114 @@ async function handleCameraToggle() {
   }
 }
 
-// Ensure instant cleanup when the user leaves the page (Back button, refresh, close tab)
-window.addEventListener('beforeunload', () => {
-  if (socket) {
-    socket.emit('leaveWorkspace');
-    socket.disconnect();
+}
+
+/* ── Phase 3: Object Interaction & Proximity ── */
+let activeObject = null;
+const PROXIMITY_THRESHOLD = 0.08; // 8% of floor size
+
+function checkObjectProximity(x, y) {
+  const objects = document.querySelectorAll('.furniture[data-type]');
+  let closestObj = null;
+  let minDistance = Infinity;
+
+  objects.forEach(obj => {
+    // Top and Left coords in CSS are sometimes used, but we added data-x and data-y
+    const objX = parseFloat(obj.getAttribute('data-x'));
+    const objY = parseFloat(obj.getAttribute('data-y'));
+    if (isNaN(objX) || isNaN(objY)) return;
+
+    // Euclidean distance
+    const dist = Math.sqrt(Math.pow(x - objX, 2) + Math.pow(y - objY, 2));
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestObj = obj;
+    }
+  });
+
+  const promptEl = document.getElementById('interaction-prompt');
+  
+  if (minDistance < PROXIMITY_THRESHOLD) {
+    activeObject = closestObj;
+    promptEl.classList.add('show');
+    // Position prompt slightly above the object
+    promptEl.style.left = activeObject.style.left || (activeObject.getAttribute('data-x') * 100 + '%');
+    promptEl.style.top = `calc(${activeObject.style.top || (activeObject.getAttribute('data-y') * 100 + '%')} - 40px)`;
+    
+    // Fallback for right/bottom positioning used in CSS
+    if (activeObject.style.right) {
+       promptEl.style.left = `calc(100% - ${activeObject.style.right})`;
+    }
+    if (activeObject.style.bottom) {
+       promptEl.style.top = `calc(100% - ${activeObject.style.bottom} - 80px)`;
+    }
+  } else {
+    activeObject = null;
+    promptEl.classList.remove('show');
+  }
+}
+
+// Listen for interaction key
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'e' || e.key === 'E') && activeObject) {
+    interactWithObject(activeObject);
   }
 });
+document.getElementById('interaction-prompt').addEventListener('click', () => {
+  if (activeObject) interactWithObject(activeObject);
+});
+
+function interactWithObject(obj) {
+  const type = obj.getAttribute('data-type');
+  const panel = document.getElementById('object-panel');
+  const title = document.getElementById('panel-title');
+  const content = document.getElementById('panel-content');
+
+  // Launch logic based on object type
+  if (type === 'coding') {
+    title.innerText = 'Integrated IDE';
+    content.innerHTML = `<p>Launching code editor instance...</p>
+      <div style="background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; font-family: monospace; height: 300px;">
+        // Your code here<br><br>
+        function helloWorld() {<br>
+        &nbsp;&nbsp;console.log("Welcome to StackMate IDE");<br>
+        }
+      </div>`;
+    panel.classList.add('open');
+  } 
+  else if (type === 'tasks') {
+    title.innerText = 'Project Task Board';
+    content.innerHTML = `<div style="display:flex; gap: 10px;">
+      <div style="background:#f3f4f6; padding:10px; border-radius:8px; width: 100%;">
+        <b>TODO</b><br>
+        <div style="background:white; padding:10px; margin-top:5px; border-radius:4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">Implement WebRTC</div>
+        <div style="background:white; padding:10px; margin-top:5px; border-radius:4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">Fix proximity audio</div>
+      </div>
+    </div>`;
+    panel.classList.add('open');
+  }
+  else if (type === 'ai') {
+    title.innerText = 'AI Assistant';
+    content.innerHTML = `<p>How can I help you today?</p>
+      <textarea style="width:100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Ask the AI..."></textarea>
+      <button style="margin-top: 10px; padding: 8px 16px; background: #8b5cf6; color: white; border: none; border-radius: 4px;">Send</button>`;
+    panel.classList.add('open');
+  }
+  else if (type === 'presentation') {
+    // Screen share placeholder
+    alert('Launching WebRTC Screen Share! (To be implemented in a dedicated screen share module)');
+  }
+  else if (type === 'docs') {
+    window.open('https://docs.google.com', '_blank'); // Example of external launcher
+  }
+}
+
+function closeObjectPanel() {
+  document.getElementById('object-panel').classList.remove('open');
+}
+
+// Hook checkObjectProximity into walkTo
+// Note: We need to modify walkTo slightly to call checkObjectProximity(x, y);
 
 // Members Drawer Toggle
 let isDrawerOpen = false;

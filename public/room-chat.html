@@ -232,14 +232,19 @@
         </div>
 
         <!-- Premium Furniture Placeholders -->
-        <div class="furniture f-desk" style="top: 15%; right: 15%; width: 220px; height: 90px;">Coding Station</div>
-        <div class="furniture f-board" style="top: 15%; left: 10%; width: 140px; height: 30px;">Knowledge Shelf</div>
-        <div class="furniture f-couch" style="bottom: 12%; right: 12%; width: 180px; height: 80px;">Sofa</div>
-        <div class="furniture f-plant" style="bottom: 22%; right: 30%;"></div>
-        <div class="furniture f-screen" style="bottom: 35%; left: 15%; width: 250px; height: 20px;">Main Stage Screen</div>
+        <div id="obj-coding-desk" class="furniture f-desk" data-type="coding" data-x="0.85" data-y="0.15" style="top: 15%; right: 15%; width: 220px; height: 90px;">Coding Station</div>
+        <div id="obj-knowledge-shelf" class="furniture f-board" data-type="docs" data-x="0.10" data-y="0.15" style="top: 15%; left: 10%; width: 140px; height: 30px;">Knowledge Shelf</div>
+        <div id="obj-task-board" class="furniture f-board" data-type="tasks" data-x="0.90" data-y="0.35" style="top: 35%; right: 10%; width: 140px; height: 30px; border-color: #f59e0b; color: #f59e0b;">Task Board</div>
+        <div id="obj-sofa" class="furniture f-couch" data-type="lounge" data-x="0.88" data-y="0.88" style="bottom: 12%; right: 12%; width: 180px; height: 80px;">Sofa</div>
+        <div id="obj-plant" class="furniture f-plant" data-type="aesthetic" data-x="0.70" data-y="0.78" style="bottom: 22%; right: 30%;"></div>
+        <div id="obj-screen" class="furniture f-screen" data-type="presentation" data-x="0.15" data-y="0.65" style="bottom: 35%; left: 15%; width: 250px; height: 20px;">Main Stage Screen</div>
+        <div id="obj-ai-desk" class="furniture f-desk" data-type="ai" data-x="0.15" data-y="0.35" style="top: 35%; left: 15%; width: 160px; height: 70px; border-top-color: #8b5cf6;">AI Assistant</div>
 
         <!-- Avatars will be dynamically injected here via JS -->
         <div id="avatars-layer"></div>
+
+        <!-- Interaction Prompt Overlay -->
+        <div id="interaction-prompt" class="interaction-prompt">Press E to Interact</div>
 
       </div>
       
@@ -254,6 +259,17 @@
         <button id="btn-toggle-camera" class="btn-media" onclick="handleCameraToggle()">
           <span class="icon">📷</span> Turn on Camera
         </button>
+      </div>
+
+      <!-- Object Interaction Side Panel -->
+      <div id="object-panel" class="object-panel">
+        <div class="panel-header">
+          <h2 id="panel-title">Application</h2>
+          <button class="btn-close-panel" onclick="closeObjectPanel()">×</button>
+        </div>
+        <div class="panel-content" id="panel-content">
+          <!-- App content injected here -->
+        </div>
       </div>
     </div>
 

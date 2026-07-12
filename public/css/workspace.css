@@ -340,3 +340,74 @@
   border-color: #10b981;
   color: #047857;
 }
+
+/* ── Phase 3: Object Interaction ── */
+.interaction-prompt {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(17, 24, 39, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 200;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  white-space: nowrap;
+}
+.interaction-prompt.show {
+  opacity: 1;
+}
+
+/* Side Panel for Launched Objects */
+.object-panel {
+  position: absolute;
+  top: 0;
+  right: -400px; /* Hidden by default */
+  width: 400px;
+  height: 100%;
+  background: white;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  transition: right 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 400; /* Below media controls but above floor */
+  display: flex;
+  flex-direction: column;
+}
+.object-panel.open {
+  right: 0;
+}
+.panel-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+}
+.panel-header h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+}
+.btn-close-panel {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+.btn-close-panel:hover {
+  color: #111827;
+}
+.panel-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
