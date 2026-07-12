@@ -415,8 +415,6 @@ async function handleCameraToggle() {
   }
 }
 
-}
-
 /* ── Phase 3: Object Interaction & Proximity ── */
 let activeObject = null;
 const PROXIMITY_THRESHOLD = 0.08; // 8% of floor size
