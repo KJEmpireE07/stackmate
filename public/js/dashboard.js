@@ -571,7 +571,7 @@ async function submitCreateRoom() {
       body: { name, category, members }
     });
     
-    window.location.href = `room-chat.html?roomId=${data.room._id}`;
+    window.location.href = `room-3d.html?roomId=${data.room._id}`;
   } catch (e) {
     showToast(e.message, 'error');
     btn.innerText = 'Create Room';
@@ -593,7 +593,7 @@ async function openRoomsDrawer() {
     }
 
     container.innerHTML = rooms.map(r => `
-      <div onclick="window.location.href='room-chat.html?roomId=${r._id}'" style="display:block; padding:1rem; border:1px solid #eee; border-radius:12px; margin-bottom:1rem; cursor:pointer; transition:border-color 0.2s;" onmouseover="this.style.borderColor='#111'" onmouseout="this.style.borderColor='#eee'">
+      <div onclick="window.location.href='room-3d.html?roomId=${r._id}'" style="display:block; padding:1rem; border:1px solid #eee; border-radius:12px; margin-bottom:1rem; cursor:pointer; transition:border-color 0.2s;" onmouseover="this.style.borderColor='#111'" onmouseout="this.style.borderColor='#eee'">
         <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
           <div style="font-weight:700; font-size:1rem;">${r.name}</div>
           <div style="font-size:0.75rem; background:#f3f4f6; padding:0.125rem 0.5rem; border-radius:12px;">${r.category}</div>
