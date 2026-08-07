@@ -85,6 +85,9 @@ io.on('connection', (socket) => {
 
 app.use(cors());
 app.use(express.json());
+// Browser-safe ES module endpoints for the interactive 3D room.
+app.use('/vendor/three', express.static(path.join(__dirname, 'node_modules', 'three', 'build')));
+app.use('/vendor/three/addons', express.static(path.join(__dirname, 'node_modules', 'three', 'examples', 'jsm')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
