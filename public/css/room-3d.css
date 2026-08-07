@@ -1,1 +1,191 @@
-﻿:root{font-family:Inter,system-ui;background:#27302d;color:#192116}*{box-sizing:border-box}body{margin:0;overflow:hidden}#workspace,#scene{width:100vw;height:100vh;display:block}.topbar{position:fixed;z-index:2;top:18px;left:18px;right:18px;display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #ffffff8f;border-radius:16px;background:#fcfef7e8;backdrop-filter:blur(14px);box-shadow:0 12px 30px #10191129}.back{display:grid;place-items:center;width:40px;height:40px;border-radius:11px;color:#172019;background:#dce9bf;text-decoration:none;font-size:22px}.topbar p{margin:0 0 2px;font-size:10px;letter-spacing:.11em;font-weight:700;color:#617155}.topbar h1{margin:0;font:700 18px/1.1 'Space Grotesk',sans-serif}.topbar small{color:#667064;font-size:12px}.topbar nav{margin-left:auto;display:flex;gap:8px}.topbar button,.topbar nav a{padding:9px 12px;border:0;border-radius:10px;background:#253629;color:#fff;font:700 12px Inter;cursor:pointer;text-decoration:none}.topbar nav a{background:#e6edda;color:#263523}aside,#loading,#error{position:fixed;z-index:2;border-radius:12px;box-shadow:0 8px 20px #0003}aside{left:18px;bottom:18px;padding:11px 13px;display:grid;gap:4px;background:#182219d6;color:#fff;font-size:12px}aside span{color:#c5d5c1;font-size:11px}#loading{top:50%;left:50%;transform:translate(-50%,-50%);padding:15px 18px;background:#182219d6;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px}#loading i{width:14px;height:14px;border:2px solid #cde2aa;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(1turn)}}#error{left:50%;bottom:30px;transform:translateX(-50%);padding:12px 14px;background:#862d2d;color:#fff}@media(max-width:600px){.topbar{top:10px;left:10px;right:10px;padding:10px}.topbar small{display:none}.topbar button,.topbar nav a{padding:8px;font-size:11px}aside{left:10px;bottom:10px}}
+/* ═══════════════════════════════════════════════
+   StackMate — Room 3D Styles
+   Premium dark glassmorphism UI
+   ═══════════════════════════════════════════════ */
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  --bg: #1a2420;
+  --glass: rgba(24, 38, 30, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --accent: #a8e063;
+  --accent-dim: #6db33f;
+  --text: #f0f5ec;
+  --text-muted: #9aaa90;
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+#workspace, #scene {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
+/* ── Top Bar (glassmorphism) ─────────────────── */
+.topbar {
+  position: fixed;
+  z-index: 10;
+  top: 16px; left: 16px; right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  background: var(--glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.back {
+  display: grid;
+  place-items: center;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  color: var(--text);
+  background: rgba(168, 224, 99, 0.15);
+  text-decoration: none;
+  font-size: 20px;
+  transition: background 0.2s, transform 0.15s;
+}
+.back:hover {
+  background: rgba(168, 224, 99, 0.3);
+  transform: scale(1.05);
+}
+
+.topbar-info p {
+  margin: 0 0 2px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--accent);
+}
+.topbar-info h1 {
+  margin: 0;
+  font: 700 17px/1.2 'Space Grotesk', sans-serif;
+  color: var(--text);
+}
+.topbar-info small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.topbar nav {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.topbar button,
+.topbar nav a {
+  padding: 9px 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  background: rgba(168, 224, 99, 0.12);
+  color: var(--text);
+  font: 600 12px 'Inter', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.topbar button:hover,
+.topbar nav a:hover {
+  background: rgba(168, 224, 99, 0.25);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* ── Aside hint ──────────────────────────────── */
+aside {
+  position: fixed;
+  z-index: 10;
+  left: 16px; bottom: 16px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+aside b { font-weight: 600; }
+aside span { color: var(--text-muted); font-size: 11px; }
+
+/* ── Loading overlay ─────────────────────────── */
+#loading {
+  position: fixed;
+  z-index: 20;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 18px 24px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+#loading i {
+  display: block;
+  width: 16px; height: 16px;
+  border: 2.5px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(1turn); } }
+
+/* ── Error display ───────────────────────────── */
+#error {
+  position: fixed;
+  z-index: 20;
+  left: 50%; bottom: 28px;
+  transform: translateX(-50%);
+  padding: 14px 18px;
+  background: rgba(180, 40, 40, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 100, 100, 0.3);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 600px) {
+  .topbar {
+    top: 8px; left: 8px; right: 8px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .topbar-info small { display: none; }
+  .topbar button,
+  .topbar nav a {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  aside {
+    left: 8px; bottom: 8px;
+    padding: 8px 10px;
+  }
+}
