@@ -1,1 +1,108 @@
-﻿<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StackMate — Workspace</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="css/room-3d.css"><script type="importmap">{"imports":{"three":"/vendor/three/three.module.js","three/addons/":"/vendor/three/addons/"}}</script></head><body><main id="workspace"><div id="loading"><i></i>Building your workspace…</div><header class="topbar"><a class="back" href="dashboard.html" aria-label="Back to dashboard">←</a><div><p>COLLABORATIVE SPACE</p><h1 id="room-name">Loading room…</h1><small id="room-meta">Preparing members…</small></div><nav><a id="chat-link" href="room-chat.html">Open chat</a><button id="reset-camera">Reset view</button></nav></header><canvas id="scene" aria-label="Interactive 3D workspace. Drag to orbit and scroll to zoom."></canvas><aside><b>Explore the workspace</b><span>Drag to orbit · scroll to zoom</span></aside><div id="error" hidden></div></main><script type="module" src="js/room-3d.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StackMate — 3D Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/room-3d.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/vendor/three/three.module.js",
+      "three/addons/": "/vendor/three/addons/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <main id="workspace">
+
+    <!-- Loading Screen -->
+    <div id="loading">
+      <div class="loader-spinner"></div>
+      <span>Building your workspace…</span>
+    </div>
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <a class="back-btn" href="dashboard.html" aria-label="Back to dashboard">←</a>
+      <div class="topbar-info">
+        <p class="topbar-label">COLLABORATIVE SPACE</p>
+        <h1 id="room-name">Loading room…</h1>
+        <small id="room-meta">Preparing members…</small>
+      </div>
+      <nav class="topbar-actions">
+        <a id="chat-link" href="room-chat.html" class="btn-topbar btn-chat">💬 Chat</a>
+        <button id="reset-camera" class="btn-topbar">🎯 Reset View</button>
+      </nav>
+    </header>
+
+    <!-- Zone HUD (Current Zone Indicator) -->
+    <div id="zone-hud">
+      <span id="zone-icon">☕</span>
+      <div>
+        <p class="zone-label">CURRENT ZONE</p>
+        <h2 id="current-zone">Lounge</h2>
+      </div>
+    </div>
+
+    <!-- Minimap -->
+    <div id="minimap">
+      <p class="minimap-title">WORKSPACE MAP</p>
+      <div class="minimap-grid">
+        <div class="minimap-zone" data-zone="research" id="minimap-research">
+          <span>🔬</span>
+          <small>Research</small>
+        </div>
+        <div class="minimap-zone" data-zone="development" id="minimap-development">
+          <span>💻</span>
+          <small>Dev Room</small>
+        </div>
+        <div class="minimap-zone" data-zone="presentation" id="minimap-presentation">
+          <span>📊</span>
+          <small>Stage</small>
+        </div>
+        <div class="minimap-zone active" data-zone="lounge" id="minimap-lounge">
+          <span>☕</span>
+          <small>Lounge</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Zone Quick-Travel Menu -->
+    <div id="zone-nav">
+      <button class="zone-btn active" data-zone="lounge" onclick="teleportToZone('lounge')">
+        <span>☕</span> Lounge
+      </button>
+      <button class="zone-btn" data-zone="development" onclick="teleportToZone('development')">
+        <span>💻</span> Development
+      </button>
+      <button class="zone-btn" data-zone="research" onclick="teleportToZone('research')">
+        <span>🔬</span> Research
+      </button>
+      <button class="zone-btn" data-zone="presentation" onclick="teleportToZone('presentation')">
+        <span>📊</span> Presentation
+      </button>
+    </div>
+
+    <!-- 3D Canvas -->
+    <canvas id="scene" aria-label="Interactive 3D workspace. Drag to orbit and scroll to zoom."></canvas>
+
+    <!-- Controls Hint -->
+    <aside id="controls-hint">
+      <b>Navigate the workspace</b>
+      <span>Drag to orbit · Scroll to zoom · Click zones to teleport</span>
+    </aside>
+
+    <!-- Error Display -->
+    <div id="error" hidden></div>
+
+  </main>
+
+  <script type="module" src="js/room-3d.js"></script>
+</body>
+</html>

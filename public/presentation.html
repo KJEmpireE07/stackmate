@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StackMate Presentation - Team Dominus 3</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --bg-card: rgba(17, 22, 34, 0.7);
+      --border-card: rgba(255, 255, 255, 0.08);
+      --accent-purple: #8b5cf6;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+      --text-white: #f3f4f6;
+      --text-gray: #9ca3af;
+      --font-outfit: 'Outfit', sans-serif;
+      --font-grotesk: 'Space Grotesk', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: var(--font-outfit);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Cosmic Background Blobs */
+    .bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(140px);
+      z-index: -1;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .blob-1 {
+      top: -10%;
+      left: -10%;
+      width: 40vw;
+      height: 40vw;
+      background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
+    }
+
+    .blob-2 {
+      bottom: -10%;
+      right: -10%;
+      width: 45vw;
+      height: 45vw;
+      background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
+    }
+
+    /* Presentation Header */
+    .pres-header {
+      padding: 24px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      background: rgba(7, 9, 14, 0.5);
+      backdrop-filter: blur(8px);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-gradient);
+      border-radius: 8px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      font-family: var(--font-grotesk);
+      font-size: 1.15rem;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    }
+
+    .logo-text {
+      font-family: var(--font-grotesk);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 50%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hackathon-badge {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #c084fc;
+      text-transform: uppercase;
+    }
+
+    /* Slide Manager Container */
+    .slide-viewport {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(50px);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                  transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                  visibility 0.6s;
+      padding: 60px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .slide.prev {
+      transform: translateX(-50px);
+    }
+
+    /* Typography & Titles */
+    .slide-title-wrapper {
+      margin-bottom: 40px;
+    }
+
+    .slide-category {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-blue);
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-family: var(--font-grotesk);
+    }
+
+    .slide-title {
+      font-family: var(--font-grotesk);
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Slide 1 - Problem CSS */
+    .problem-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .problem-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      padding: 20px 24px;
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    .card-icon-red {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.2rem;
+    }
+
+    .card-content h3 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .card-content p {
+      font-size: 0.92rem;
+      color: var(--text-gray);
+      line-height: 1.4;
+    }
+
+    .problem-conclusion {
+      margin-top: 24px;
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #a78bfa;
+      border-left: 3px solid var(--accent-purple);
+      padding-left: 16px;
+    }
+
+    .problem-illustration {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Isolated Tools Animation Graphic */
+    .tools-orbit {
+      width: 320px;
+      height: 320px;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: spin 30s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .tool-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      font-size: 1.3rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      animation: keep-upright 30s linear infinite;
+    }
+
+    @keyframes keep-upright {
+      100% { transform: rotate(-360deg); }
+    }
+
+    .t1 { top: -24px; left: calc(50% - 24px); }
+    .t2 { right: -24px; top: calc(50% - 24px); }
+    .t3 { bottom: -24px; left: calc(50% - 24px); }
+    .t4 { left: -24px; top: calc(50% - 24px); }
+
+    .center-logo-shield {
+      width: 100px;
+      height: 100px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .cross-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.7rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    /* Slide 2 - Introducing StackMate CSS */
+    .workspace-preview-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .features-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      padding: 24px;
+      border-radius: 16px;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(59, 130, 246, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .feat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--accent-blue);
+      margin-bottom: 16px;
+    }
+
+    .feature-card h4 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .feature-card p {
+      font-size: 0.88rem;
+      color: var(--text-gray);
+      line-height: 1.45;
+    }
+
+    .horizontal-workflow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      padding: 24px 30px;
+      border-radius: 20px;
+      margin-top: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      flex: 1;
+    }
+
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+    }
+
+    .step-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .step-arrow {
+      color: var(--accent-blue);
+      font-weight: 700;
+      padding: 0 10px;
+      font-size: 1.2rem;
+      opacity: 0.6;
+    }
+
+    /* Slide 3 - Diagram CSS */
+    .flow-diagram-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .diagram-nodes {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      padding: 20px 0;
+    }
+
+    .diagram-connector {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue), var(--accent-cyan));
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+
+    .node {
+      background: #0f131c;
+      border: 2px solid var(--border-card);
+      border-radius: 20px;
+      padding: 24px;
+      width: 180px;
+      text-align: center;
+      z-index: 2;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .node:hover {
+      border-color: var(--accent-purple);
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(139, 92, 246, 0.2);
+    }
+
+    .node-icon {
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      width: 60px;
+      height: 60px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .node-label {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .node-desc {
+      font-size: 0.78rem;
+      color: var(--text-gray);
+      line-height: 1.3;
+    }
+
+    .workspace-glowing-card {
+      margin-top: 40px;
+      width: 100%;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      padding: 24px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      max-width: 900px;
+      backdrop-filter: blur(10px);
+    }
+
+    .workspace-glowing-card span {
+      font-size: 2.2rem;
+    }
+
+    .workspace-glowing-card h4 {
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .workspace-glowing-card p {
+      font-size: 0.92rem;
+      color: var(--text-gray);
+      line-height: 1.4;
+    }
+
+    /* Slide 4 - Virtual Workspace CSS */
+    .office-zones-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 10px;
+    }
+
+    .zone-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 30px 24px;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      height: 380px;
+    }
+
+    .zone-card.research { border-top: 4px solid var(--accent-purple); }
+    .zone-card.dev { border-top: 4px solid var(--accent-blue); }
+    .zone-card.present { border-top: 4px solid var(--accent-cyan); }
+    .zone-card.lounge { border-top: 4px solid #ec4899; }
+
+    .zone-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+
+    .zone-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .zone-icon {
+      font-size: 1.8rem;
+    }
+
+    .zone-title {
+      font-family: var(--font-grotesk);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .zone-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .zone-list li {
+      font-size: 0.9rem;
+      color: var(--text-gray);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .zone-list li::before {
+      content: "•";
+      color: var(--accent-purple);
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .zone-card.dev .zone-list li::before { color: var(--accent-blue); }
+    .zone-card.present .zone-list li::before { color: var(--accent-cyan); }
+    .zone-card.lounge .zone-list li::before { color: #ec4899; }
+
+    .workspace-summary-stats {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 16px 40px;
+      border-radius: 30px;
+      width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .stat-item {
+      font-size: 0.92rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    /* Slide 5 - Roadmap Timeline CSS */
+    .roadmap-timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      position: relative;
+      margin-top: 20px;
+    }
+
+    .roadmap-connector-line {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      z-index: 1;
+    }
+
+    .roadmap-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 30px 24px;
+      z-index: 2;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .roadmap-card:hover {
+      border-color: var(--accent-purple);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.1);
+    }
+
+    .phase-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .phase-1 { background: rgba(139, 92, 246, 0.1); color: #c084fc; border-color: rgba(139, 92, 246, 0.2); }
+    .phase-2 { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border-color: rgba(59, 130, 246, 0.2); }
+    .phase-3 { background: rgba(6, 182, 212, 0.1); color: #22d3ee; border-color: rgba(6, 182, 212, 0.2); }
+    .phase-4 { background: rgba(236, 72, 153, 0.1); color: #f472b6; border-color: rgba(236, 72, 153, 0.2); }
+
+    .roadmap-card h4 {
+      font-family: var(--font-grotesk);
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .roadmap-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .roadmap-list li {
+      font-size: 0.85rem;
+      color: var(--text-gray);
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .roadmap-list li::before {
+      content: "✓";
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    /* Slide 6 - Thank You CSS */
+    .thank-you-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .thank-you-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .thank-you-title {
+      font-family: var(--font-grotesk);
+      font-size: 4.5rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .thank-you-subtitle {
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--text-gray);
+      margin-bottom: 40px;
+    }
+
+    .presenter-details {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 420px;
+    }
+
+    .presenter-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      font-size: 0.95rem;
+    }
+
+    .presenter-row:last-child {
+      border-bottom: none;
+    }
+
+    .presenter-row span:first-child {
+      color: var(--text-gray);
+    }
+
+    .presenter-row span:last-child {
+      font-weight: 600;
+    }
+
+    .thank-you-illustration {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Unified Connection Animation Graphic */
+    .unified-shield {
+      width: 260px;
+      height: 260px;
+      border-radius: 36px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border: 2px solid rgba(139, 92, 246, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 50px rgba(139, 92, 246, 0.2);
+      gap: 16px;
+      position: relative;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .unified-circle {
+      width: 70px;
+      height: 70px;
+      background: var(--accent-gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+    }
+
+    .connection-pulse {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border: 1px solid rgba(139, 92, 246, 0.1);
+      border-radius: 50%;
+      animation: pulse-ring 4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.6); opacity: 0; }
+      50% { opacity: 0.5; }
+      100% { transform: scale(1.2); opacity: 0; }
+    }
+
+    /* Controls Bar & Footer */
+    .pres-footer {
+      padding: 24px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      background: rgba(7, 9, 14, 0.8);
+      z-index: 10;
+    }
+
+    .controls-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-nav {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .btn-nav:active {
+      transform: scale(0.95);
+    }
+
+    .slide-indicator {
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--text-gray);
+    }
+
+    .hotkey-tip {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+      background: rgba(255,255,255,0.03);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
+      
+      body {
+        overflow: visible !important;
+        height: auto !important;
+        background: #07090e !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .bg-blob, .pres-header, .pres-footer, .hotkey-tip, .controls-wrapper {
+        display: none !important;
+      }
+      
+      .slide-viewport {
+        height: auto !important;
+        overflow: visible !important;
+      }
+      
+      .slide {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        padding: 40px 60px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+      }
+
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Glowing Blobs -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <!-- Header -->
+  <header class="pres-header">
+    <div class="logo-container">
+      <div class="logo-mark">S</div>
+      <span class="logo-text">StackMate</span>
+    </div>
+    <div class="hackathon-badge">Innoforge Hackathon • Team Dominus 3</div>
+  </header>
+
+  <!-- Slide Viewport -->
+  <main class="slide-viewport">
+
+    <!-- SLIDE 1: Problem Statement -->
+    <section class="slide active" id="slide-1">
+      <div class="problem-layout">
+        <div>
+          <div class="slide-title-wrapper">
+            <p class="slide-category">The Problem</p>
+            <h2 class="slide-title">The Problem with Student <span style="background: linear-gradient(135deg, #f87171 0%, #f43f5e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Collaboration</span></h2>
+          </div>
+          <div class="problem-cards">
+            <div class="card">
+              <div class="card-icon-red">🔍</div>
+              <div class="card-content">
+                <h3>Teammate Discovery</h3>
+                <p>Extremely hard to find skilled, like-minded partners for specialized hackathon tracks.</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-icon-red">💬</div>
+              <div class="card-content">
+                <h3>Scattered Communication</h3>
+                <p>Forced to jump between WhatsApp (chat), Zoom (meetings), Google Drive (resources), and GitHub (code).</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-icon-red">⏳</div>
+              <div class="card-content">
+                <h3>Productivity Leak</h3>
+                <p>Constantly switching between 5+ detached apps destroys focus, causing communication gaps.</p>
+              </div>
+            </div>
+          </div>
+          <p class="problem-conclusion">
+            "There should be one intelligent workspace where students can find teammates, communicate, build projects, and collaborate seamlessly."
+          </p>
+        </div>
+        
+        <div class="problem-illustration">
+          <div class="tools-orbit">
+            <div class="tool-icon t1">WhatsApp <span class="cross-badge">✕</span></div>
+            <div class="tool-icon t2">Zoom <span class="cross-badge">✕</span></div>
+            <div class="tool-icon t3">Jira <span class="cross-badge">✕</span></div>
+            <div class="tool-icon t4">Drive <span class="cross-badge">✕</span></div>
+          </div>
+          <div class="center-logo-shield">⚒️</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: Meet StackMate -->
+    <section class="slide" id="slide-2">
+      <div class="workspace-preview-layout">
+        <div>
+          <div class="slide-title-wrapper">
+            <p class="slide-category">Introducing</p>
+            <h2 class="slide-title">Meet <span class="gradient-text">StackMate</span></h2>
+          </div>
+          <p style="font-size: 1.1rem; color: var(--text-gray); line-height: 1.6; margin-bottom: 24px;">
+            An AI-powered, centralized collaborative platform built specifically for student innovators, startup founders, hackathon teams, and side-project creators.
+          </p>
+          <div class="features-list">
+            <div class="feature-card">
+              <div class="feat-icon">👥</div>
+              <h4>Smart Discovery</h4>
+              <p>Find teammates matching your tech stack, goals, and working style.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feat-icon">⚡</div>
+              <h4>Centralized Space</h4>
+              <p>No external tools needed. Chat, coordinate, and code all in one UI.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feat-icon">🤖</div>
+              <h4>AI Assisted</h4>
+              <p>Leverage virtual workspaces equipped with contextual artificial intelligence.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feat-icon">🤝</div>
+              <h4>Direct Connect</h4>
+              <p>Send friend requests, create teams, and start working instantly.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <!-- Workflow Infographic -->
+          <h3 style="font-family: var(--font-grotesk); font-size: 1.4rem; margin-bottom: 20px; align-self: flex-start;">Workflow Pathway</h3>
+          <div class="horizontal-workflow" style="flex-direction: column; gap: 20px; align-items: stretch; max-width: 400px; width: 100%;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div class="step-num">1</div>
+              <div class="step-label" style="flex: 1; padding-left: 20px; text-align: left;">Create Profile</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div class="step-num">2</div>
+              <div class="step-label" style="flex: 1; padding-left: 20px; text-align: left;">Discover Teammates</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div class="step-num">3</div>
+              <div class="step-label" style="flex: 1; padding-left: 20px; text-align: left;">Connect & Friend</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div class="step-num">4</div>
+              <div class="step-label" style="flex: 1; padding-left: 20px; text-align: left;">Spawn Workspace</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div class="step-num">5</div>
+              <div class="step-label" style="flex: 1; padding-left: 20px; text-align: left;">Collaborate & Launch</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: How StackMate Works -->
+    <section class="slide" id="slide-3">
+      <div class="flow-diagram-container">
+        <div class="slide-title-wrapper" style="text-align: center; margin-bottom: 60px;">
+          <p class="slide-category">The Workflow</p>
+          <h2 class="slide-title">How <span class="gradient-text">StackMate Works</span></h2>
+        </div>
+
+        <div class="diagram-nodes">
+          <div class="diagram-connector"></div>
+          
+          <div class="node">
+            <div class="node-icon">🔑</div>
+            <div class="node-label">User Login</div>
+            <div class="node-desc">Authenticate and load user credentials.</div>
+          </div>
+
+          <div class="node">
+            <div class="node-icon">📊</div>
+            <div class="node-label">Dashboard</div>
+            <div class="node-desc">Access projects, find friends, and find teammates.</div>
+          </div>
+
+          <div class="node">
+            <div class="node-icon">➕</div>
+            <div class="node-label">Create / Join</div>
+            <div class="node-desc">Initiate a new project space or accept an invite.</div>
+          </div>
+
+          <div class="node">
+            <div class="node-icon">🚀</div>
+            <div class="node-label">Room Workspace</div>
+            <div class="node-desc">Step into the integrated continuous virtual room.</div>
+          </div>
+
+          <div class="node">
+            <div class="node-icon">🤝</div>
+            <div class="node-label">Collaborate</div>
+            <div class="node-desc">Real-time chat, P2P WebRTC audio/video and tools.</div>
+          </div>
+        </div>
+
+        <div class="workspace-glowing-card">
+          <span>💡</span>
+          <div>
+            <h4>One Shared Digital Workspace</h4>
+            <p>Instead of jumping across disconnected platforms, every project creates an immersive spatial floor plan. Team members share proximity voice channels, file panels, task lists, and screen shares natively inside the single workspace.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: Project Workspace (Core Innovation) -->
+    <section class="slide" id="slide-4">
+      <div class="slide-title-wrapper">
+        <p class="slide-category">Core Innovation</p>
+        <h2 class="slide-title">The Continuous <span class="gradient-text">Project Workspace</span></h2>
+      </div>
+
+      <div class="office-zones-grid">
+        <!-- Zone 1 -->
+        <div class="zone-card research">
+          <div class="zone-header">
+            <span class="zone-icon">🔍</span>
+            <h3 class="zone-title">Research Lab</h3>
+          </div>
+          <ul class="zone-list">
+            <li>Integrated Browser</li>
+            <li>Contextual AI Agent</li>
+            <li>Shared Team Notes</li>
+            <li>Research Repository</li>
+          </ul>
+        </div>
+
+        <!-- Zone 2 -->
+        <div class="zone-card dev">
+          <div class="zone-header">
+            <span class="zone-icon">💻</span>
+            <h3 class="zone-title">Development Room</h3>
+          </div>
+          <ul class="zone-list">
+            <li>Co-coding Sandbox</li>
+            <li>Agile Task Board</li>
+            <li>Bug Tracker</li>
+            <li>API Documentation</li>
+          </ul>
+        </div>
+
+        <!-- Zone 3 -->
+        <div class="zone-card present">
+          <div class="zone-header">
+            <span class="zone-icon">📊</span>
+            <h3 class="zone-title">Presentation Stage</h3>
+          </div>
+          <ul class="zone-list">
+            <li>Real-time Screen Share</li>
+            <li>WebRTC Presentation</li>
+            <li>Pitch Practice Area</li>
+            <li>Slide Previews</li>
+          </ul>
+        </div>
+
+        <!-- Zone 4 -->
+        <div class="zone-card lounge">
+          <div class="zone-header">
+            <span class="zone-icon">☕</span>
+            <h3 class="zone-title">The Lounge</h3>
+          </div>
+          <ul class="zone-list">
+            <li>Proximity Audio Chat</li>
+            <li>Water-cooler Huddles</li>
+            <li>Team Bonding</li>
+            <li>Casual Hangout</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="workspace-summary-stats">
+        <div class="stat-item">
+          <div class="stat-bullet"></div>
+          <span>Fluid Spatial Movement (2D Canvas Floor)</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-bullet"></div>
+          <span>Zone-restricted Proximity Audio Channels</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-bullet"></div>
+          <span>Dynamic Live Avatar Presence Indicators</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: Future Roadmap -->
+    <section class="slide" id="slide-5">
+      <div class="slide-title-wrapper">
+        <p class="slide-category">Growth & Future</p>
+        <h2 class="slide-title">Future <span class="gradient-text">Enhancements</span></h2>
+      </div>
+
+      <div class="roadmap-timeline">
+        <div class="roadmap-connector-line"></div>
+        
+        <!-- Phase 1 -->
+        <div class="roadmap-card">
+          <span class="phase-badge phase-1">Phase 1</span>
+          <h4>Virtual MVP</h4>
+          <ul class="roadmap-list">
+            <li>2D Spatial Floor</li>
+            <li>WebRTC Voice Mesh</li>
+            <li>Live Video Avatars</li>
+          </ul>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="roadmap-card">
+          <span class="phase-badge phase-2">Phase 2</span>
+          <h4>AI & Ideation</h4>
+          <ul class="roadmap-list">
+            <li>AI Research Agent</li>
+            <li>AI Coding Assistant</li>
+            <li>Collaborative Whiteboard</li>
+            <li>Centralized Team Notes</li>
+          </ul>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="roadmap-card">
+          <span class="phase-badge phase-3">Phase 3</span>
+          <h4>Rich Media</h4>
+          <ul class="roadmap-list">
+            <li>Stage Screen Sharing</li>
+            <li>Collaborative Files</li>
+            <li>Presentation Analytics</li>
+            <li>Automated Recording</li>
+          </ul>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="roadmap-card">
+          <span class="phase-badge phase-4">Phase 4</span>
+          <h4>Ecosystem</h4>
+          <ul class="roadmap-list">
+            <li>GitHub Integration</li>
+            <li>Figma Panel Sync</li>
+            <li>Smart Audio Filtering</li>
+            <li>AI Meeting Recaps</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: Thank You -->
+    <section class="slide" id="slide-6">
+      <div class="thank-you-layout">
+        <div class="thank-you-left">
+          <h2 class="thank-you-title">Thank You.</h2>
+          <p class="thank-you-subtitle">Building the Future of Student Collaboration</p>
+          
+          <div class="presenter-details">
+            <div class="presenter-row">
+              <span>Team Name</span>
+              <span style="color: var(--accent-purple);">Dominus 3</span>
+            </div>
+            <div class="presenter-row">
+              <span>Hackathon</span>
+              <span>Innoforge (Innogeek)</span>
+            </div>
+            <div class="presenter-row">
+              <span>College</span>
+              <span>Innogeek Developer Hub</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="thank-you-illustration">
+          <div class="connection-pulse"></div>
+          <div class="unified-shield">
+            <div class="unified-circle">🚀</div>
+            <h3 style="font-family: var(--font-grotesk); font-weight: 700; font-size: 1.3rem;">StackMate</h3>
+            <p style="font-size: 0.82rem; color: var(--text-gray); text-align: center; max-width: 180px; line-height: 1.3;">One workspace. Endless collaboration.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Controls Footer -->
+  <footer class="pres-footer">
+    <div class="hotkey-tip">Tip: Use <b>Left/Right Arrows</b> to change slides</div>
+    <div class="controls-wrapper">
+      <button class="btn-nav" id="btn-prev" onclick="prevSlide()">◀</button>
+      <div class="slide-indicator" id="slide-num">SLIDE 1 / 6</div>
+      <button class="btn-nav" id="btn-next" onclick="nextSlide()">▶</button>
+    </div>
+  </footer>
+
+  <script>
+    let currentSlideIndex = 1;
+    const totalSlides = 6;
+
+    function updateSlides() {
+      // Manage slide visibility classes
+      for (let i = 1; i <= totalSlides; i++) {
+        const slide = document.getElementById(`slide-${i}`);
+        slide.classList.remove('active', 'prev');
+        
+        if (i === currentSlideIndex) {
+          slide.classList.add('active');
+        } else if (i < currentSlideIndex) {
+          slide.classList.add('prev');
+        }
+      }
+
+      // Update indicator
+      document.getElementById('slide-num').innerText = `SLIDE ${currentSlideIndex} / ${totalSlides}`;
+    }
+
+    function nextSlide() {
+      if (currentSlideIndex < totalSlides) {
+        currentSlideIndex++;
+        updateSlides();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlideIndex > 1) {
+        currentSlideIndex--;
+        updateSlides();
+      }
+    }
+
+    // Keyboard bindings
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      }
+    });
+  </script>
+</body>
+</html>
