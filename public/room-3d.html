@@ -16,6 +16,7 @@
     }
   }
   </script>
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
@@ -100,6 +101,149 @@
 
     <!-- Error Display -->
     <div id="error" hidden></div>
+
+    <!-- Lounge Interactive Station Modal -->
+    <div id="lounge-modal" class="lounge-modal-backdrop" hidden>
+      <div class="lounge-modal-card">
+        <button class="lounge-modal-close" id="lounge-modal-close" aria-label="Close menu">&times;</button>
+        
+        <header class="lounge-modal-header">
+          <div class="lounge-modal-badge" id="lounge-station-badge">☕ ESPRESSO & BARISTA STATION</div>
+          <h2 id="lounge-station-title">Lounge Barista Menu</h2>
+          <p id="lounge-station-desc">Brew fresh coffee or grab a snack to boost your productivity. Sounds are isolated to Lounge members.</p>
+          <div class="lounge-audio-badge" id="lounge-audio-status">
+            <span class="audio-dot"></span> <span id="audio-status-text">🔊 Lounge Audio Active</span>
+          </div>
+        </header>
+
+        <!-- Menu Grid -->
+        <div class="lounge-menu-grid" id="lounge-menu-grid">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Brewing / Dispensing Progress Bar (hidden by default) -->
+        <div id="lounge-brewing-panel" hidden>
+          <div class="brewing-status-info">
+            <span id="brewing-icon">☕</span>
+            <span id="brewing-status-text">Grinding premium beans…</span>
+          </div>
+          <div class="brewing-progress-bar">
+            <div class="brewing-progress-fill" id="brewing-progress-fill"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Lounge TV & Synchronized Jukebox Modal -->
+    <div id="lounge-tv-modal" class="lounge-modal-backdrop" hidden>
+      <div class="lounge-modal-card tv-modal-card">
+        <button class="lounge-modal-close" id="lounge-tv-modal-close" aria-label="Close TV player">&times;</button>
+        
+        <header class="lounge-modal-header">
+          <div class="tv-header-badges">
+            <span class="lounge-modal-badge tv-badge">📺 LOUNGE TV & JUKEBOX</span>
+            <span class="lounge-audio-badge sync-badge" id="tv-sync-badge"><span class="audio-dot"></span> 🔴 ROOM LIVE SYNC</span>
+          </div>
+          <h2>Lounge TV Stream & Music</h2>
+          <p>Choose a stream or paste a YouTube URL to play music synchronously for everyone in the Lounge.</p>
+        </header>
+
+        <!-- Current Playing Track Info Bar -->
+        <div class="tv-now-playing" id="tv-now-playing">
+          <div class="tv-track-info">
+            <span class="tv-screen-icon">📺</span>
+            <div>
+              <strong id="tv-current-title">Lofi Study Beats 24/7</strong>
+              <small id="tv-current-channel">Relaxing Beats to Study & Code To</small>
+            </div>
+          </div>
+          <div class="equalizer" id="tv-equalizer">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <!-- Preset Music Stations -->
+        <div class="tv-section-title">PRESET STATIONS</div>
+        <div class="tv-stations-grid">
+          <button class="tv-station-card active" data-yt="jfKfPfyJRdk" data-title="Lofi Study Beats" data-desc="24/7 Relaxing Lofi Beats">
+            <span class="station-icon">🎧</span>
+            <strong>Lofi Beats</strong>
+            <small>Relaxing Study</small>
+          </button>
+          <button class="tv-station-card" data-yt="4xDzrJKXOOY" data-title="Synthwave Chill" data-desc="Retro Synth & Cyber Beats">
+            <span class="station-icon">🌌</span>
+            <strong>Synthwave</strong>
+            <small>Retro Chill</small>
+          </button>
+          <button class="tv-station-card" data-yt="lTRiuFIWV54" data-title="Coffee Shop Jazz" data-desc="Smooth Ambient Jazz & Rain">
+            <span class="station-icon">☕</span>
+            <strong>Lounge Jazz</strong>
+            <small>Warm Ambiance</small>
+          </button>
+          <button class="tv-station-card" data-yt="DWcJFNfaw9c" data-title="Deep Focus Techno" data-desc="Minimal Ambient Electronic">
+            <span class="station-icon">⚡</span>
+            <strong>Deep Focus</strong>
+            <small>Coding Flow</small>
+          </button>
+        </div>
+
+        <!-- Custom YouTube Link Input -->
+        <div class="tv-section-title">CUSTOM YOUTUBE LINK</div>
+        <div class="tv-custom-input">
+          <input type="text" id="tv-yt-input" placeholder="Paste YouTube Video / Music URL…" />
+          <button id="tv-yt-btn" class="tv-play-btn">Play Stream</button>
+        </div>
+
+        <!-- Audio Controls & Player Bar -->
+        <div class="tv-player-controls">
+          <button id="tv-toggle-play" class="tv-ctrl-btn">⏸️ Pause</button>
+          <div class="tv-volume-box">
+            <span>🔊</span>
+            <input type="range" id="tv-volume-slider" min="0" max="100" value="80" />
+          </div>
+        </div>
+
+        <!-- Embedded YouTube Frame (hidden or embedded) -->
+        <div id="tv-player-container" class="tv-iframe-box">
+          <div id="tv-youtube-player"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Playable Billiards / Pool Table Modal -->
+    <div id="lounge-billiards-modal" class="lounge-modal-backdrop" hidden>
+      <div class="lounge-modal-card pool-modal-card">
+        <button class="lounge-modal-close" id="lounge-billiards-close" aria-label="Close Billiards">&times;</button>
+        
+        <header class="lounge-modal-header">
+          <div class="lounge-modal-badge pool-badge">🎱 LOUNGE BILLIARDS & POOL</div>
+          <h2>8-Ball Lounge Billiards</h2>
+          <p>Aim with cursor, click & drag back to adjust power, and release to shoot the cue ball!</p>
+        </header>
+
+        <!-- Billiards Game Stats & Score -->
+        <div class="pool-score-bar">
+          <span id="pool-score-text">Balls Pocketed: 0 / 7</span>
+          <button id="billiards-reset-btn" class="pool-reset-btn">🔄 Rack New Game</button>
+        </div>
+
+        <!-- Billiards Interactive Canvas -->
+        <div class="pool-canvas-container">
+          <canvas id="billiards-canvas" width="560" height="300"></canvas>
+        </div>
+
+        <!-- Shot Controls Hint -->
+        <footer class="pool-footer-hint">
+          <span>💡 <b>Controls:</b> Move mouse to aim · Click & Drag backwards for shot power · Release to shoot</span>
+        </footer>
+
+      </div>
+    </div>
+
+    <!-- Toast Notifications for Boosts -->
+    <div id="lounge-toast-container"></div>
 
   </main>
 

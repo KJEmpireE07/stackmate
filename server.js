@@ -74,6 +74,15 @@ io.on('connection', (socket) => {
     socket.to(roomId).emit('partnerStatus', { status });
   });
 
+  // Lounge TV Synchronized Music events
+  socket.on('loungePlayMusic', ({ roomId, track, isPlaying, timestamp, senderId }) => {
+    socket.to(roomId).emit('loungeSyncMusic', { track, isPlaying, timestamp, senderId });
+  });
+
+  socket.on('loungeStopMusic', ({ roomId, senderId }) => {
+    socket.to(roomId).emit('loungeSyncStop', { senderId });
+  });
+
   socket.on('disconnect', () => {
     // Notify all rooms this socket was in
     socket.rooms.forEach(room => {
@@ -105,12 +114,29 @@ app.get('*', (req, res) => {
   res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
+const PORT = parseInt(process.env.PORT, 10) || 3000;
+
+function startServer(port) {
+  server.listen(port, () => {
+    console.log(`🚀 StackMate v2 running on http://localhost:${port}`);
+  });
+}
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use. Trying another port...`);
+    const fallbackPort = PORT + 1;
+    server.close(() => startServer(fallbackPort));
+  } else {
+    console.error('❌ Server error:', err.message);
+    process.exit(1);
+  }
+});
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB connected');
-    server.listen(process.env.PORT || 3000, () => {
-      console.log(`🚀 StackMate v2 running on http://localhost:${process.env.PORT || 3000}`);
-    });
+    startServer(PORT);
   })
   .catch(err => {
     console.error('❌ MongoDB connection error:', err.message);
