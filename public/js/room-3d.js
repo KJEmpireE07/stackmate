@@ -80,8 +80,8 @@ const M = {
   researchWall: mat(0xF0F0F0),
 
   // Development
-  devFloor: mat(0x303030, { roughness: 0.5 }),
-  devWall: mat(0x2a2a2a),
+  devFloor: mat(0xA8A8A8, { roughness: 0.9 }),  // darker grey-white mix
+  devWall: mat(0xE8B830),                        // lighter golden yellow
   ledStrip: mat(0x00ff88, { emissive: 0x00ff44, emissiveIntensity: 0.6 }),
 
   // Presentation
